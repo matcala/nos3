@@ -65,6 +65,7 @@
 #include "generic_star_tracker_msgids.h"
 #include "mgr_msgids.h"
 #include "syn_msgids.h"
+#include "aranya_ep_msgids.h"   // Aranya Endpoint
 
 /*
 ** Local Structure Declarations
@@ -133,6 +134,7 @@ TO_LAB_Subs_t TO_LAB_Subs =
         {CFE_SB_MSGID_WRAP_VALUE(SYN_HK_TLM_MID),               {0,0},  32},
         {CFE_SB_MSGID_WRAP_VALUE(SCH_HK_TLM_MID),               {0,0},  32},
         {CFE_SB_MSGID_WRAP_VALUE(SCH_DIAG_TLM_MID),             {0,0},  32},
+        {CFE_SB_MSGID_WRAP_VALUE(ARANYA_EP_HK_TLM_MID),         {0,0},  32},
 
     }
 };
