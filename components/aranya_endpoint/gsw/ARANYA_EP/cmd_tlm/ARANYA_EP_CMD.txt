@@ -1,0 +1,46 @@
+COMMAND ARANYA_EP ARANYA_EP_NOOP <%= CosmosCfsConfig::PROCESSOR_ENDIAN %> "Aranya Endpoint NOOP Command"
+  APPEND_PARAMETER CCSDS_STREAMID      16 UINT MIN_UINT16 MAX_UINT16 0x18A0 "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_SEQUENCE      16 UINT MIN_UINT16 MAX_UINT16 0xC000 "CCSDS Packet Sequence Control" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_LENGTH        16 UINT MIN_UINT16 MAX_UINT16 1      "CCSDS Packet Data Length" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_FC            8  UINT MIN_UINT8 MAX_UINT8 0        "CCSDS Command Function Code" 
+  APPEND_PARAMETER CCSDS_CHECKSUM      8  UINT MIN_UINT8 MAX_UINT8 0        "CCSDS Command Checksum"
+
+COMMAND ARANYA_EP ARANYA_EP_RST <%= CosmosCfsConfig::PROCESSOR_ENDIAN %> "Aranya Endpoint Reset Counters Command"
+  APPEND_PARAMETER CCSDS_STREAMID      16 UINT MIN_UINT16 MAX_UINT16 0x18A0 "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_SEQUENCE      16 UINT MIN_UINT16 MAX_UINT16 0xC000 "CCSDS Packet Sequence Control" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_LENGTH        16 UINT MIN_UINT16 MAX_UINT16 1      "CCSDS Packet Data Length" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_FC            8  UINT MIN_UINT8 MAX_UINT8 1        "CCSDS Command Function Code" 
+  APPEND_PARAMETER CCSDS_CHECKSUM      8  UINT MIN_UINT8 MAX_UINT8 0        "CCSDS Command Checksum"
+
+COMMAND ARANYA_EP ARANYA_EP_SET_DEST <%= CosmosCfsConfig::PROCESSOR_ENDIAN %> "Aranya Endpoint Set Destination MsgId Command"
+  APPEND_PARAMETER CCSDS_STREAMID      16 UINT MIN_UINT16 MAX_UINT16 0x18A0 "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_SEQUENCE      16 UINT MIN_UINT16 MAX_UINT16 0xC000 "CCSDS Packet Sequence Control" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_LENGTH        16 UINT MIN_UINT16 MAX_UINT16 5      "CCSDS Packet Data Length" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_FC            8  UINT MIN_UINT8 MAX_UINT8 2        "CCSDS Command Function Code" 
+  APPEND_PARAMETER CCSDS_CHECKSUM      8  UINT MIN_UINT8 MAX_UINT8 0        "CCSDS Command Checksum"
+  APPEND_PARAMETER DEST_MSGIDVAL       32 UINT MIN_UINT32 MAX_UINT32 0      "Destination SB MsgId (numeric value)"
+
+COMMAND ARANYA_EP ARANYA_EP_SET_UDS <%= CosmosCfsConfig::PROCESSOR_ENDIAN %> "Aranya Endpoint Set UDS Socket Path Command"
+  APPEND_PARAMETER CCSDS_STREAMID      16 UINT MIN_UINT16 MAX_UINT16 0x18A0 "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_SEQUENCE      16 UINT MIN_UINT16 MAX_UINT16 0xC000 "CCSDS Packet Sequence Control" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_LENGTH        16 UINT MIN_UINT16 MAX_UINT16 129    "CCSDS Packet Data Length" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_FC            8  UINT MIN_UINT8 MAX_UINT8 3        "CCSDS Command Function Code" 
+  APPEND_PARAMETER CCSDS_CHECKSUM      8  UINT MIN_UINT8 MAX_UINT8 0        "CCSDS Command Checksum"
+  APPEND_PARAMETER UDS_PATH            512 STRING "/ram/aranya/daemon.sock" "Daemon UDS path (e.g., /ram/aranya/daemon.sock)"
+# STRING size could be 0 and would fill rest of packet, according to COSMOS docs
+# https://docs.openc3.com/docs/configuration/command#append_parameter
+
+COMMAND ARANYA_EP ARANYA_EP_FWD <%= CosmosCfsConfig::PROCESSOR_ENDIAN %> "Aranya Endpoint Authorize & Forward Command"
+  APPEND_PARAMETER CCSDS_STREAMID      16 UINT MIN_UINT16 MAX_UINT16 0x18A0 "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_SEQUENCE      16 UINT MIN_UINT16 MAX_UINT16 0xC000 "CCSDS Packet Sequence Control" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_LENGTH        16 UINT MIN_UINT16 MAX_UINT16 259    "CCSDS Packet Data Length" BIG_ENDIAN
+  APPEND_PARAMETER CCSDS_FC            8  UINT MIN_UINT8 MAX_UINT8 4        "CCSDS Command Function Code" 
+  APPEND_PARAMETER CCSDS_CHECKSUM      8  UINT MIN_UINT8 MAX_UINT8 0        "CCSDS Command Checksum"
+  APPEND_PARAMETER DEST_FC             8  UINT MIN_UINT8 MAX_UINT8 0        "Destination function code"
+  APPEND_PARAMETER PAYLOAD_LEN         16 UINT MIN_UINT16 MAX_UINT16 0      "Bytes in payload"
+  APPEND_PARAMETER PAYLOAD             2048  BLOCK    0                     "Hex CMD payload (size=PAYLOAD_LEN)"
+# TODO: check if size is enough to contain payload
+# TODO: check default value
+# 2048bit = 256B = 32 characters 
+
+# TODO: missing request HK command definition to match aranya_ep_msgids.h 0x18A1
