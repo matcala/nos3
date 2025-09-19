@@ -64,7 +64,7 @@
 			<enable>true</enable>
 		</st>
 		<syn>
-			<enable>false</enable>
+			<enable>true</enable>
 		</syn>
 		<torquer>
 			<enable>true</enable>
@@ -73,8 +73,8 @@
 			<enable>false</enable>
 		</thruster>
 		<aranya_ep>
-         <enable>true</enable>
-      </aranya_ep>
+			<enable>true</enable>
+		</aranya_ep>
 	</components>
 	<gui>
 		<enable>true</enable>
