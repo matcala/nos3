@@ -16,9 +16,13 @@
 #include "aranya_ep_msgids.h"
 #include "aranya_ep_msg.h"
 #include "aranya_ep_version.h"
+#include "aranya_ep_perfids.h"
 
 /* Aranya C API */
 #include "aranya-client.h"
+
+#include <stdbool.h>
+#include <string.h>
 
 /*
 ** Specified pipe depth - how many messages will be queued in the pipe
@@ -29,6 +33,11 @@
 ** UDS path buffer size
 */
 #define ARANYA_EP_UDS_PATH_SIZE 128
+
+/*
+** Default UDS path
+*/
+#define ARANYA_EP_DEFAULT_UDS_PATH "/ram/aranya/aranya_ep.sock"
 
 /*
 ** Authorization result codes
@@ -71,8 +80,14 @@ typedef struct
     /*
     ** Aranya client state
     */
+    // TODO: check and maybe remove.
     struct AranyaClient ArClient;     /* Aranya client instance */
     bool                ArClientInit; /* Flag indicating if Aranya client is initialized */
+
+    /*
+    ** Application run status
+    */
+    uint32 RunStatus; /* For CFE_ES_RunLoop (must be uint32 for CFE_ES_RunLoop) */
 
 } ARANYA_EP_AppData_t;
 
@@ -90,12 +105,14 @@ extern ARANYA_EP_AppData_t ARANYA_EP_App; /* ARANYA_EP App Data */
 **       functions are not called from any other source module.
 */
 void  ARANYA_EP_AppMain(void);
-int32 ARANYA_EP_Init(void);
+// int32 ARANYA_EP_Init(void);
 void  ARANYA_EP_ProcessCommand(void);
 void  ARANYA_EP_ProcessGroundCommand(CFE_MSG_FcnCode_t FcnCode);
-void  ARANYA_EP_SendHousekeeping(void);
-bool  ARANYA_EP_InitAranya(void);
-bool  ARANYA_EP_AuthorizeForward(void);
-void  ARANYA_EP_ForwardToDest(const ARANYA_EP_ForwardCmd_t *cmd);
+// void  ARANYA_EP_SendHousekeeping(void);
+// bool  ARANYA_EP_InitAranya(void);
+// bool  ARANYA_EP_AuthorizeForward(void);
+// void  ARANYA_EP_ForwardToDest(const ARANYA_EP_ForwardCmd_t *Cmd);
+int32 ARANYA_EP_VerifyCmdLength(CFE_MSG_Message_t *MsgPtr, size_t Expected);
+// bool  ARANYA_EP_ValidateUdsPath(const char *Path);
 
 #endif /* _ARANYA_EP_APP_H_ */
