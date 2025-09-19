@@ -26,6 +26,7 @@ cam.jpg
 .cdskeyfile
 .reservedkeyfile
 .resetkeyfile
+.venv/
 
 #
 # Documentation
