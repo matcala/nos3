@@ -21,7 +21,8 @@ components = {
     "novatel_oem615": "gps",
     "onair": "onair",
     "sample": "sample",
-    "syn": "syn"
+    "syn": "syn",
+    "aranya_ep": "aranya_ep",
 }
 
 def clean_target_lines(input_file, output_file, sc_root):
