@@ -123,6 +123,7 @@ list(APPEND MISSION_GLOBAL_APPLIST
         onair
         sample/fsw/cfs
         syn/fsw/cfs
+        aranya_ep/fsw/cfs
 )
 
 # Create Application Platform Include List
