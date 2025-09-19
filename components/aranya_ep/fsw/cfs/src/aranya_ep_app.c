@@ -12,6 +12,18 @@
 /* Global app data - defined here, declared extern in header */
 ARANYA_EP_AppData_t ARANYA_EP_App;
 
+/* Simple runtime presence check for Aranya C API */
+static void ARANYA_EP_AranyaLibTest(void)
+{
+    struct AranyaExtError ext;
+    memset(&ext, 0, sizeof(ext));
+    size_t need = 0;
+    /* Intentionally call to obtain required buffer size (no actual error expected) */
+    (void)aranya_ext_error_msg(&ext, NULL, &need);
+    CFE_EVS_SendEvent(ARANYA_EP_INIT_INF_EID, CFE_EVS_EventType_INFORMATION,
+                      "Aranya API presence check OK (ext msg size=%lu)", (unsigned long)need);
+}
+
 /* Entry point */
 void ARANYA_EP_AppMain(void)
 {
@@ -30,13 +42,19 @@ void ARANYA_EP_AppMain(void)
     {
         ARANYA_EP_App.RunStatus = CFE_ES_RunStatus_APP_ERROR;
     }
-    else if (CFE_SB_CreatePipe(&ARANYA_EP_App.CmdPipeId, ARANYA_EP_PIPE_DEPTH, "ARANYA_EP_CMD_PIPE") != CFE_SUCCESS)
+    else
     {
-        ARANYA_EP_App.RunStatus = CFE_ES_RunStatus_APP_ERROR;
-    }
-    else if (CFE_SB_Subscribe(CFE_SB_ValueToMsgId(ARANYA_EP_CMD_MID), ARANYA_EP_App.CmdPipeId) != CFE_SUCCESS)
-    {
-        ARANYA_EP_App.RunStatus = CFE_ES_RunStatus_APP_ERROR;
+        /* Perform lightweight Aranya C Client dyn library presence test */
+        ARANYA_EP_AranyaLibTest();
+
+        if (CFE_SB_CreatePipe(&ARANYA_EP_App.CmdPipeId, ARANYA_EP_PIPE_DEPTH, "ARANYA_EP_CMD_PIPE") != CFE_SUCCESS)
+        {
+            ARANYA_EP_App.RunStatus = CFE_ES_RunStatus_APP_ERROR;
+        }
+        else if (CFE_SB_Subscribe(CFE_SB_ValueToMsgId(ARANYA_EP_CMD_MID), ARANYA_EP_App.CmdPipeId) != CFE_SUCCESS)
+        {
+            ARANYA_EP_App.RunStatus = CFE_ES_RunStatus_APP_ERROR;
+        }
     }
     if (status != CFE_SUCCESS)
     {
