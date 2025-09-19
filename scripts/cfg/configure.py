@@ -123,7 +123,7 @@ else:
         sc_syn_en = sc_root.find('components/syn/enable').text
         sc_torquer_en = sc_root.find('components/torquer/enable').text
         sc_thruster_en = sc_root.find('components/thruster/enable').text
-        sc_aranya_ep_en = sc_root.find('components/aranya_ap/enable').text
+        sc_aranya_ep_en = sc_root.find('components/aranya_ep/enable').text
 
         sc_gui_en = sc_root.find('gui/enable').text
         sc_orbit_tipoff_x = sc_root.find('orbit/tipoff_x').text

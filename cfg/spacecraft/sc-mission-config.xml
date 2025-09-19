@@ -73,7 +73,7 @@
 			<enable>false</enable>
 		</thruster>
 		<aranya_ep>
-            <enable>true</enable>
+         <enable>true</enable>
       </aranya_ep>
 	</components>
 	<gui>
