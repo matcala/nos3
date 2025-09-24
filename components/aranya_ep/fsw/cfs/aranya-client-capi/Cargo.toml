@@ -1,0 +1,49 @@
+[package]
+name = "aranya-client-capi"
+description = "C API for the aranya-client library"
+version = "2.0.0"                # choose same as related crates or set your own
+authors = ["SpiderOak, Inc."]
+edition = "2021"
+license = "AGPL-3.0-only"
+repository = "https://github.com/aranya-project/aranya"
+rust-version = "1.85"
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+doctest = false
+
+[features]
+default = []
+
+[dependencies]
+# Internal aranya crates (Option A: use version if published)
+aranya-client = { version = "2.0.0" }
+aranya-daemon-api = { version = "2.0.0" }
+aranya-util = { version = "2.0.0" }
+
+# If not published on crates.io, comment the three above and uncomment these:
+# aranya-client = { git = "https://github.com/aranya-project/aranya", tag = "v2.0.0", package = "aranya-client" }
+# aranya-daemon-api = { git = "https://github.com/aranya-project/aranya", tag = "v2.0.0", package = "aranya-daemon-api" }
+# aranya-util = { git = "https://github.com/aranya-project/aranya", tag = "v2.0.0", package = "aranya-util" }
+
+aranya-capi-core = { version = "0.4.4" }
+aranya-crypto = { version = "0.9.0", features = ["alloc", "aqc", "fs-keystore", "clone-aead", "std", "tls"] }
+buggy = { version = "0.1.0" }
+
+anyhow = { version = "1.0.86" }
+bytes = { version = "1.10.0" }
+postcard = { version = "1", default-features = false, features = ["use-std", "heapless", "experimental-derive"] }
+thiserror = { version = "2.0" }
+tokio = { version = "1.44" }
+tracing = { version = "0.1.40" }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+
+[build-dependencies]
+aranya-capi-codegen = { version = "0.3.3" }
+anyhow = { version = "1.0.86" }
+quote = "1"
+syn = "2"
+
+# [lints]
+# Optional: replicate minimal lint config locally (adjust as needed)
+# workspace = false
