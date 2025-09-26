@@ -15,7 +15,7 @@ FetchContent_Declare(
 include_directories(
     mission_inc
     platform_inc
-    fsw/src
+    src
     include         # aranya-client.h placed here
     ${hwlib_MISSION_DIR}/fsw/public_inc
 )
