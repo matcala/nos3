@@ -48,6 +48,7 @@ INFLUXDB_ADMIN_PASSWORD=admin_password
     DNETWORK="docker network"
 #fi
 
+# Modified to use upgraded image
 DBOX="matcala/nos3-rust:latest"
 
 # Debugging
