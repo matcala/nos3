@@ -59,7 +59,7 @@ typedef struct
 
 
 /*
-** SAMPLE housekeeping type definition
+** ARANYA_EP housekeeping packet definition
 */
 typedef struct
 {

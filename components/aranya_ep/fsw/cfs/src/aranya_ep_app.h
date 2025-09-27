@@ -35,9 +35,16 @@
 #define ARANYA_EP_UDS_PATH_SIZE 128
 
 /*
-** Default UDS path
+** Default Daemon configs
 */
-#define ARANYA_EP_DEFAULT_UDS_PATH "/ram/aranya/aranya_ep.sock"
+// #define ARANYA_EP_DEFAULT_DAEMON_PATH "/home/jstar/Desktop/daemon"
+// #define ARANYA_EP_DEFAULT_DAEMON_MNT_PATH "/daemon"
+#define ARANYA_EP_DEFAULT_UDS_PATH "/run/aranya/run/uds.sock"
+
+/*
+** Default AQC server address
+*/
+#define ARANYA_EP_DEFAULT_AQC_ADDR "127.0.0.1:11001"
 
 /*
 ** Authorization result codes
@@ -69,6 +76,7 @@ typedef struct
     uint32            AuthorizedCount; /* Count of authorized forwards */
     uint32            DeniedCount;     /* Count of denied forwards */
     uint32            LastAuthResult;  /* Last authorization result */
+    // TODO: change to bool?
 
     /*
     ** Application configuration
@@ -80,9 +88,8 @@ typedef struct
     /*
     ** Aranya client state
     */
-    // TODO: check and maybe remove.
-    struct AranyaClient ArClient;     /* Aranya client instance */
-    bool                ArClientInit; /* Flag indicating if Aranya client is initialized */
+    AranyaClient        Client;     /* Aranya client instance */
+    bool                ClientInitialized; /* Flag indicating if Aranya client is initialized */
 
     /*
     ** Application run status
@@ -105,14 +112,7 @@ extern ARANYA_EP_AppData_t ARANYA_EP_App; /* ARANYA_EP App Data */
 **       functions are not called from any other source module.
 */
 void  ARANYA_EP_AppMain(void);
-// int32 ARANYA_EP_Init(void);
 void  ARANYA_EP_ProcessCommand(void);
 void  ARANYA_EP_ProcessGroundCommand(CFE_MSG_FcnCode_t FcnCode);
-// void  ARANYA_EP_SendHousekeeping(void);
-// bool  ARANYA_EP_InitAranya(void);
-// bool  ARANYA_EP_AuthorizeForward(void);
-// void  ARANYA_EP_ForwardToDest(const ARANYA_EP_ForwardCmd_t *Cmd);
-int32 ARANYA_EP_VerifyCmdLength(CFE_MSG_Message_t *MsgPtr, size_t Expected);
-// bool  ARANYA_EP_ValidateUdsPath(const char *Path);
 
 #endif /* _ARANYA_EP_APP_H_ */
