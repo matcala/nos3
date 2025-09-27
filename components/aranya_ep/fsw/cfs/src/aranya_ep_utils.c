@@ -30,7 +30,7 @@ void ARANYA_EP_AranyaLibTest(void)
     size_t need = 0;
     (void)aranya_ext_error_msg(&ext, NULL, &need);
     CFE_EVS_SendEvent(ARANYA_EP_INIT_INF_EID, CFE_EVS_EventType_INFORMATION,
-                      "Aranya API presence check OK (ext msg size=%lu)", (unsigned long)need);
+                      "Aranya C API presence check OK (ext msg size=%lu)", (unsigned long)need);
 }
 
 /* Brings up Aranya client */
@@ -199,26 +199,6 @@ int32 ARANYA_EP_Init(void)
     status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(ARANYA_EP_SEND_HK_MID), ARANYA_EP_App.CmdPipeId);
     if (status != CFE_SUCCESS) return status;
 
-    /*
-    Mapping a host directory into the file system of the cFS application.
-    cFS uses virtual file system (VFS) provided by OSAL and to host directories need to manually exposed.  
-    */
-    // osal_id_t fs_id = OS_OBJECT_ID_UNDEFINED;
-    // status = OS_FileSysAddFixedMap(&fs_id, ARANYA_EP_DEFAULT_DAEMON_PATH, ARANYA_EP_DEFAULT_DAEMON_MNT_PATH);
-    // //osal_id_t fs_id_storage = OS_OBJECT_ID_UNDEFINED;
-    // //fs_id = &fs_id_storage;
-    // if (status != OS_SUCCESS)
-    // {
-    //     CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-    //                         "Failed to map host dir to /daemon");
-    // }
-    // else
-    // {
-    //     CFE_EVS_SendEvent(ARANYA_EP_INIT_INF_EID, CFE_EVS_EventType_INFORMATION,
-    //                         "Mapped host dir to /daemon with fs_id %d", (int)fs_id);
-
-    // }
-
     ARANYA_EP_App.RunStatus = CFE_ES_RunStatus_APP_RUN;
     /* Copy default UDS path safely ensuring null-termination */
     (void)snprintf(ARANYA_EP_App.UdsPath, sizeof(ARANYA_EP_App.UdsPath), "%s", ARANYA_EP_DEFAULT_UDS_PATH);
@@ -367,8 +347,3 @@ int32 ARANYA_EP_ListDir(const char *dir_path)
 {
     return ARANYA_EP_MountAndList(NULL, NULL, dir_path);
 }
-
-/* Example usage:
-   ARANYA_EP_MountAndList("ramdev0", "/ram0", "/ram0/apps");
-   ARANYA_EP_ListDir("/cf");
-*/
