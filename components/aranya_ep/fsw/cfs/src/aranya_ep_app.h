@@ -35,16 +35,19 @@
 #define ARANYA_EP_UDS_PATH_SIZE 128
 
 /*
-** Default Daemon configs
+** Default Daemon config
 */
-// #define ARANYA_EP_DEFAULT_DAEMON_PATH "/home/jstar/Desktop/daemon"
-// #define ARANYA_EP_DEFAULT_DAEMON_MNT_PATH "/daemon"
 #define ARANYA_EP_DEFAULT_UDS_PATH "/run/aranya/run/uds.sock"
 
 /*
 ** Default AQC server address
 */
 #define ARANYA_EP_DEFAULT_AQC_ADDR "127.0.0.1:11001"
+
+/*
+** Default keybundle file permissions
+*/
+#define OS_DEFAULT_FILE_PERMISSIONS 0777
 
 /*
 ** Authorization result codes
@@ -90,6 +93,7 @@ typedef struct
     */
     AranyaClient        Client;     /* Aranya client instance */
     bool                ClientInitialized; /* Flag indicating if Aranya client is initialized */
+    char                DeviceIdStr[ARANYA_ID_STR_LEN]; /* Cached human-readable device ID */
 
     /*
     ** Application run status

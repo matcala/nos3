@@ -9,6 +9,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>  /* added for va_list */
+#include <stdint.h>
+#include <stdlib.h>
 
 #include "aranya_ep_utils.h"
 #include "aranya_ep_events.h"
@@ -21,6 +23,9 @@
 /* Persistent HK packet to avoid using a stack buffer that may be accessed
  * asynchronously by the software bus after ARANYA_EP_SendHousekeeping returns. */
 static ARANYA_EP_HkTlm_t ARANYA_EP_HkPkt;
+
+/* New: Persistent Onboard Announce packet for the same reason as HK */
+static ARANYA_EP_OnboardAnnounceTlm_t ARANYA_EP_AnnouncePkt;
 
 /* Simple runtime presence check for Aranya C API */
 void ARANYA_EP_AranyaLibTest(void)
@@ -134,16 +139,14 @@ bool ARANYA_EP_InitAranya(void)
                 }
             }
         }
-        // currently getting: EVS Port1 EVS Port1 42/1/ARANYA_EP 12: aranya_client_init failed (7): IPC error
+
         CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
                           "aranya_client_init failed (%d): %s", rc,
                           buf ? buf : fallback);
         if (buf) free(buf);
+
         return false;
     }
-
-    // TODO: grab public key and save it somewhere 
-    // TODO: ideally send back to ground as TLM?
 
     AranyaDeviceId dev_id;
     rc = aranya_get_device_id(&ARANYA_EP_App.Client, &dev_id);
@@ -154,11 +157,15 @@ bool ARANYA_EP_InitAranya(void)
         AranyaError rc2                   = aranya_id_to_str(&dev_id.id, dev_str, &dev_str_len);
         if (rc2 == ARANYA_ERROR_SUCCESS)
         {
+            /* Cache device ID string for later telemetry use */
+            (void)snprintf(ARANYA_EP_App.DeviceIdStr, sizeof(ARANYA_EP_App.DeviceIdStr), "%s", dev_str);
+
             CFE_EVS_SendEvent(ARANYA_EP_SOCKET_INF_EID, CFE_EVS_EventType_INFORMATION,
                               "Connected to Aranya daemon; device ID=%s", dev_str);
         }
         else
         {
+            ARANYA_EP_App.DeviceIdStr[0] = '\0';
             CFE_EVS_SendEvent(ARANYA_EP_SOCKET_INF_EID, CFE_EVS_EventType_INFORMATION,
                               "Couldn't obtain dev ID. ERROR: %d", rc2);
         }
@@ -168,7 +175,157 @@ bool ARANYA_EP_InitAranya(void)
         CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
                           "aranya_get_device_id failed (%d); continuing", rc);
         aranya_client_cleanup(&ARANYA_EP_App.Client);
+
         return false;
+    }
+
+    /* Retrieve keybundle using non-NULL buffer pattern */
+    size_t kb_len = 1;
+    uint8_t *kb = (uint8_t *)calloc(kb_len, 1);
+    if (kb == NULL)
+    {
+        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "Keybundle initial alloc failed (len=%lu)", (unsigned long)kb_len);
+    }
+    else
+    {
+        AranyaExtError kb_err;
+        memset(&kb_err, 0, sizeof(kb_err));
+
+        AranyaError krc = aranya_get_key_bundle_ext(&ARANYA_EP_App.Client, kb, &kb_len, &kb_err);
+        if (krc == ARANYA_ERROR_BUFFER_TOO_SMALL)
+        {
+            /* Sanity cap to avoid unexpected huge allocations */
+            if (kb_len == 0 || kb_len > (64 * 1024))
+            {
+                CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
+                                  "Keybundle invalid required length %lu", (unsigned long)kb_len);
+            }
+            else
+            {
+                uint8_t *tmp = (uint8_t *)realloc(kb, kb_len);
+                if (tmp == NULL)
+                {
+                    CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
+                                      "Keybundle realloc failed (len=%lu)", (unsigned long)kb_len);
+                }
+                else
+                {
+                    kb = tmp;
+                    /* Ensure buffer is zeroed before receiving key bytes */
+                    memset(kb, 0, kb_len);
+                    memset(&kb_err, 0, sizeof(kb_err));
+                    krc = aranya_get_key_bundle_ext(&ARANYA_EP_App.Client, kb, &kb_len, &kb_err);
+                    if (krc == ARANYA_ERROR_SUCCESS)
+                    {
+                        /* Save keybundle to /data/aranya/keybundle.bin via OSAL */
+                        (void)OS_mkdir("/data/aranya", OS_DEFAULT_FILE_PERMISSIONS); /* ok if it already exists */
+
+                        const char *kb_path = "/data/aranya/keybundle.bin";
+                        osal_id_t   fd      = OS_OBJECT_ID_UNDEFINED;
+                        int32       rc_open = OS_OpenCreate(&fd, kb_path,
+                                                            OS_FILE_FLAG_CREATE | OS_FILE_FLAG_TRUNCATE,
+                                                            OS_READ_WRITE);
+                        if (rc_open == OS_SUCCESS)
+                        {
+                            int32 rc_wr = OS_write(fd, kb, (size_t)kb_len);
+                            if (rc_wr == (int32)kb_len)
+                            {
+                                CFE_EVS_SendEvent(ARANYA_EP_SOCKET_INF_EID, CFE_EVS_EventType_INFORMATION,
+                                                  "Keybundle saved to %s (%lu bytes)", kb_path, (unsigned long)kb_len);
+                            }
+                            else
+                            {
+                                CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
+                                                  "Keybundle write failed (%ld/%lu) to %s",
+                                                  (long)rc_wr, (unsigned long)kb_len, kb_path);
+                            }
+                            (void)OS_close(fd);
+                        }
+                        else
+                        {
+                            CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
+                                              "Keybundle open/create failed rc=%ld path=%s", (long)rc_open, kb_path);
+                        }
+                    }
+                    else
+                    {
+                        size_t elen = 0;
+                        aranya_ext_error_msg(&kb_err, NULL, &elen);
+                        char *ebuf = NULL;
+                        if (elen > 0 && elen < 4096)
+                        {
+                            ebuf = (char *)malloc(elen);
+                            if (ebuf)
+                            {
+                                if (aranya_ext_error_msg(&kb_err, ebuf, &elen) != ARANYA_ERROR_SUCCESS)
+                                {
+                                    free(ebuf);
+                                    ebuf = NULL;
+                                }
+                            }
+                        }
+                        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
+                                          "Keybundle fetch failed (%d): %s", krc, ebuf ? ebuf : "unknown");
+                        if (ebuf) free(ebuf);
+                    }
+                }
+            }
+        }
+        else if (krc == ARANYA_ERROR_SUCCESS)
+        {
+            /* Edge case: small initial buffer was enough; save directly */
+            (void)OS_mkdir("/data/aranya", OS_DEFAULT_FILE_PERMISSIONS);
+            const char *kb_path = "/data/aranya/keybundle.bin";
+            osal_id_t   fd      = OS_OBJECT_ID_UNDEFINED;
+            int32       rc_open = OS_OpenCreate(&fd, kb_path,
+                                                OS_FILE_FLAG_CREATE | OS_FILE_FLAG_TRUNCATE,
+                                                OS_READ_WRITE);
+            if (rc_open == OS_SUCCESS)
+            {
+                int32 rc_wr = OS_write(fd, kb, (size_t)kb_len);
+                if (rc_wr == (int32)kb_len)
+                {
+                    CFE_EVS_SendEvent(ARANYA_EP_SOCKET_INF_EID, CFE_EVS_EventType_INFORMATION,
+                                      "Keybundle saved to %s (%lu bytes)", kb_path, (unsigned long)kb_len);
+                }
+                else
+                {
+                    CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
+                                      "Keybundle write failed (%ld/%lu) to %s",
+                                      (long)rc_wr, (unsigned long)kb_len, kb_path);
+                }
+                (void)OS_close(fd);
+            }
+            else
+            {
+                CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
+                                  "Keybundle open/create failed rc=%ld path=%s", (long)rc_open, kb_path);
+            }
+        }
+        else
+        {
+            size_t elen = 0;
+            aranya_ext_error_msg(&kb_err, NULL, &elen);
+            char *ebuf = NULL;
+            if (elen > 0 && elen < 4096)
+            {
+                ebuf = (char *)malloc(elen);
+                if (ebuf)
+                {
+                    if (aranya_ext_error_msg(&kb_err, ebuf, &elen) != ARANYA_ERROR_SUCCESS)
+                    {
+                        free(ebuf);
+                        ebuf = NULL;
+                    }
+                }
+            }
+            CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "Keybundle fetch failed (%d): %s", krc, ebuf ? ebuf : "unknown");
+            if (ebuf) free(ebuf);
+        }
+
+        if (kb) free(kb);
     }
 
     ARANYA_EP_App.ClientInitialized = true;
@@ -228,7 +385,9 @@ void ARANYA_EP_SendHousekeeping(void)
     /* Use persistent packet to avoid dangling pointer after return */
     ARANYA_EP_HkTlm_t *hk = &ARANYA_EP_HkPkt;
     memset(hk, 0, sizeof(*hk));
-    CFE_MSG_Init(CFE_MSG_PTR(hk->TlmHeader), CFE_SB_ValueToMsgId(ARANYA_EP_HK_TLM_MID), sizeof(*hk));
+    CFE_MSG_Init(CFE_MSG_PTR(hk->TlmHeader), 
+                CFE_SB_ValueToMsgId(ARANYA_EP_HK_TLM_MID), 
+                sizeof(*hk));
 
     hk->CmdCounter      = ARANYA_EP_App.CmdCounter;
     hk->ErrCounter      = ARANYA_EP_App.ErrCounter;
@@ -243,6 +402,33 @@ void ARANYA_EP_SendHousekeeping(void)
         CFE_EVS_SendEvent(ARANYA_EP_HK_SENT_EID, CFE_EVS_EventType_INFORMATION,
                           "HK telemetry sent: CmdCnt=%u ErrCnt=%u DestMID=0x%08lX",
                           hk->CmdCounter, hk->ErrCounter, (unsigned long)hk->DestMsgIdVal);
+    }
+
+    /* Build and transmit Onboard Announce telemetry */
+    ARANYA_EP_OnboardAnnounceTlm_t *onb_announcement = &ARANYA_EP_AnnouncePkt;
+    memset(onb_announcement, 0, sizeof(*onb_announcement));
+    CFE_MSG_Init(CFE_MSG_PTR(onb_announcement->TlmHeader),
+                 CFE_SB_ValueToMsgId(ARANYA_EP_ONBOARD_ANNOUNCE_TLM_MID),
+                 sizeof(*onb_announcement));
+
+    /* Device ID string from cached AppData value */
+    if (ARANYA_EP_App.DeviceIdStr[0] != '\0')
+    {
+        (void)snprintf(onb_announcement->DeviceId, 
+                        sizeof(onb_announcement->DeviceId), 
+                        "%s", ARANYA_EP_App.DeviceIdStr);
+    }
+
+    /* For now, do not retrieve keybundle here; will be sourced from cached metadata later */
+    onb_announcement->KeyBundleLen = 0;
+    onb_announcement->KeyBundleHash[0] = '\0';
+    /* TODO: Populate KeyBundleLen/KeyBundleHash from cached keybundle metadata collected in InitAranya */
+
+    tx_status = CFE_SB_TransmitMsg((CFE_MSG_Message_t *)onb_announcement, true);
+    if (tx_status == CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(ARANYA_EP_HK_SENT_EID, CFE_EVS_EventType_INFORMATION,
+                          "ONBOARDING telemetry sent.");
     }
 }
 
