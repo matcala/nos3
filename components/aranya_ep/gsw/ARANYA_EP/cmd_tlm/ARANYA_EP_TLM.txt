@@ -1,0 +1,18 @@
+TELEMETRY ARANYA_EP ARANYA_EP_HK_TLM <%= CosmosCfsConfig::PROCESSOR_ENDIAN %> "ARANYA_EP_HkTlm_t"
+  APPEND_ID_ITEM CCSDS_STREAMID       16 UINT 0x08A0  "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_ITEM    CCSDS_SEQUENCE       16 UINT         "CCSDS Packet Sequence Control" BIG_ENDIAN
+  APPEND_ITEM    CCSDS_LENGTH         16 UINT         "CCSDS Packet Data Length" BIG_ENDIAN
+  APPEND_ITEM    CCSDS_SECONDS        32 UINT         "CCSDS Telemetry Secondary Header (seconds)" BIG_ENDIAN
+  APPEND_ITEM    CCSDS_SUBSECS        16 UINT         "CCSDS Telemetry Secondary Header (subseconds)" BIG_ENDIAN
+  APPEND_ITEM    CCSDS_SPARE          32 UINT         ""
+
+  APPEND_ITEM    CMD_COUNT             8 UINT         "Command Count"
+  APPEND_ITEM    ERR_COUNT             8 UINT         "Error Count"
+  APPEND_ITEM    AUTHORIZED_COUNT     32 UINT         "Authorized forward count"
+  APPEND_ITEM    DENIED_COUNT         32 UINT         "Denied forward count"
+  APPEND_ITEM    LAST_AUTH_RESULT     32 UINT         "Last authorization result"
+      STATE UNKNOWN   0
+      STATE ALLOWED   1
+      STATE DENIED    2
+      STATE ERROR     3
+  APPEND_ITEM    DEST_MSGID           32 UINT         "Destination SB MsgId (numeric value)"

@@ -237,7 +237,13 @@ void ARANYA_EP_SendHousekeeping(void)
     hk->LastAuthResult  = ARANYA_EP_App.LastAuthResult;
     hk->DestMsgIdVal    = CFE_SB_MsgIdToValue(ARANYA_EP_App.DestMsgId);
 
-    CFE_SB_TransmitMsg((CFE_MSG_Message_t *)hk, true);
+    int32 tx_status = CFE_SB_TransmitMsg((CFE_MSG_Message_t *)hk, true);
+    if (tx_status == CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(ARANYA_EP_HK_SENT_EID, CFE_EVS_EventType_INFORMATION,
+                          "HK telemetry sent: CmdCnt=%u ErrCnt=%u DestMID=0x%08lX",
+                          hk->CmdCounter, hk->ErrCounter, (unsigned long)hk->DestMsgIdVal);
+    }
 }
 
 bool ARANYA_EP_ValidateUdsPath(const char *Path)

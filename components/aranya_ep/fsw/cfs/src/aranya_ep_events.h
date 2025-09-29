@@ -26,4 +26,7 @@ Look at SAMPLE_APP_EVENTS.H for reference
 #define ARANYA_EP_SETDEST_INF_EID    14
 #define ARANYA_EP_SOCKET_INF_EID     15
 
+/* DEBUG: Housekeeping telemetry successfully sent */
+#define ARANYA_EP_HK_SENT_EID  0x00F0 
+
 #endif /* _ARANYA_EP_EVENTS_H_ */
