@@ -19,6 +19,7 @@
 /*
 ** CCSDS V1 Telemetry Message IDs must be 0x08xx
 */
-#define ARANYA_EP_HK_TLM_MID       0x08A0
+#define ARANYA_EP_HK_TLM_MID             0x08A0
+#define ARANYA_EP_ONBOARD_ANNOUNCE_TLM_MID 0x08A2 
 
 #endif /* _ARANYA_EP_MSGIDS_H_ */

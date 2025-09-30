@@ -180,6 +180,7 @@ bool ARANYA_EP_InitAranya(void)
     }
 
     /* Retrieve keybundle using non-NULL buffer pattern */
+    ARANYA_EP_App.KeyBundleLen = 0; /* reset cached length before fetch */
     size_t kb_len = 1;
     uint8_t *kb = (uint8_t *)calloc(kb_len, 1);
     if (kb == NULL)
@@ -218,6 +219,9 @@ bool ARANYA_EP_InitAranya(void)
                     krc = aranya_get_key_bundle_ext(&ARANYA_EP_App.Client, kb, &kb_len, &kb_err);
                     if (krc == ARANYA_ERROR_SUCCESS)
                     {
+                        /* Cache keybundle length upon successful retrieval */
+                        ARANYA_EP_App.KeyBundleLen = (uint32)kb_len;
+
                         /* Save keybundle to /data/aranya/keybundle.bin via OSAL */
                         (void)OS_mkdir("/data/aranya", OS_DEFAULT_FILE_PERMISSIONS); /* ok if it already exists */
 
@@ -274,6 +278,9 @@ bool ARANYA_EP_InitAranya(void)
         }
         else if (krc == ARANYA_ERROR_SUCCESS)
         {
+            /* Cache keybundle length when small initial buffer was enough */
+            ARANYA_EP_App.KeyBundleLen = (uint32)kb_len;
+
             /* Edge case: small initial buffer was enough; save directly */
             (void)OS_mkdir("/data/aranya", OS_DEFAULT_FILE_PERMISSIONS);
             const char *kb_path = "/data/aranya/keybundle.bin";
@@ -329,6 +336,10 @@ bool ARANYA_EP_InitAranya(void)
     }
 
     ARANYA_EP_App.ClientInitialized = true;
+
+    /* Send onboarding announcement once, now that client init succeeded */
+    ARANYA_EP_SendOnboardAnnounce();
+
     return true;
 }
 
@@ -337,8 +348,6 @@ int32 ARANYA_EP_Init(void)
 {
     int32 status;
 
-    // TODO: check init of bool fields of app data
-    // might need to manually set to false
     memset(&ARANYA_EP_App, 0, sizeof(ARANYA_EP_App));
     ARANYA_EP_App.DestMsgId = CFE_SB_INVALID_MSG_ID;
 
@@ -404,7 +413,13 @@ void ARANYA_EP_SendHousekeeping(void)
                           hk->CmdCounter, hk->ErrCounter, (unsigned long)hk->DestMsgIdVal);
     }
 
-    /* Build and transmit Onboard Announce telemetry */
+    // TODO: remove, here temporarily for debugging
+    ARANYA_EP_SendOnboardAnnounce();
+}
+
+/* New: Send Onboard Announce telemetry once (or when desired) */
+void ARANYA_EP_SendOnboardAnnounce(void)
+{
     ARANYA_EP_OnboardAnnounceTlm_t *onb_announcement = &ARANYA_EP_AnnouncePkt;
     memset(onb_announcement, 0, sizeof(*onb_announcement));
     CFE_MSG_Init(CFE_MSG_PTR(onb_announcement->TlmHeader),
@@ -419,12 +434,11 @@ void ARANYA_EP_SendHousekeeping(void)
                         "%s", ARANYA_EP_App.DeviceIdStr);
     }
 
-    /* For now, do not retrieve keybundle here; will be sourced from cached metadata later */
-    onb_announcement->KeyBundleLen = 0;
-    onb_announcement->KeyBundleHash[0] = '\0';
-    /* TODO: Populate KeyBundleLen/KeyBundleHash from cached keybundle metadata collected in InitAranya */
+    /* Use cached keybundle metadata collected in InitAranya */
+    onb_announcement->KeyBundleLen = ARANYA_EP_App.KeyBundleLen;
+    onb_announcement->KeyBundleHash[0] = '\0'; /* TODO: populate when available */
 
-    tx_status = CFE_SB_TransmitMsg((CFE_MSG_Message_t *)onb_announcement, true);
+    int32 tx_status = CFE_SB_TransmitMsg((CFE_MSG_Message_t *)onb_announcement, true);
     if (tx_status == CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(ARANYA_EP_HK_SENT_EID, CFE_EVS_EventType_INFORMATION,

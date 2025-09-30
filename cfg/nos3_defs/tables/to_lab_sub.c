@@ -135,6 +135,7 @@ TO_LAB_Subs_t TO_LAB_Subs =
         {CFE_SB_MSGID_WRAP_VALUE(SCH_HK_TLM_MID),               {0,0},  32},
         {CFE_SB_MSGID_WRAP_VALUE(SCH_DIAG_TLM_MID),             {0,0},  32},
         {CFE_SB_MSGID_WRAP_VALUE(ARANYA_EP_HK_TLM_MID),         {0,0},  32},
+        {CFE_SB_MSGID_WRAP_VALUE(ARANYA_EP_ONBOARD_ANNOUNCE_TLM_MID),         {0,0},  32},
 
     }
 };

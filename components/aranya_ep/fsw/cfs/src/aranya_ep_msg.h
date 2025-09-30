@@ -74,4 +74,22 @@ typedef struct
 } __attribute__((packed)) ARANYA_EP_HkTlm_t;
 #define ARANYA_EP_HK_LNGTH sizeof(ARANYA_EP_HkTlm_t)
 
+/*
+** New: Onboard Announce telemetry packet
+** Includes device ID, key bundle length, and a hash string of the key bundle.
+*/
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t TlmHeader;
+    /* Human-readable device ID (null-terminated) */
+    char   DeviceId[128];
+    /* Serialized key bundle length in bytes */
+    uint32 KeyBundleLen;
+    /* Hex-encoded hash string of the key bundle (null-terminated).
+       Using 64-bit FNV-1a -> 16 hex chars + NUL (up to 65 reserved for future expansion) */
+    char   KeyBundleHash[65];
+
+} __attribute__((packed)) ARANYA_EP_OnboardAnnounceTlm_t;
+#define ARANYA_EP_ONBOARD_ANNOUNCE_LNGTH sizeof(ARANYA_EP_OnboardAnnounceTlm_t)
+
 #endif /* _ARANYA_EP_MSG_H_ */

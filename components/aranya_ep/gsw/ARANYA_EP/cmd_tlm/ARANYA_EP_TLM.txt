@@ -16,3 +16,15 @@ TELEMETRY ARANYA_EP ARANYA_EP_HK_TLM <%= CosmosCfsConfig::PROCESSOR_ENDIAN %> "A
       STATE DENIED    2
       STATE ERROR     3
   APPEND_ITEM    DEST_MSGID           32 UINT         "Destination SB MsgId (numeric value)"
+
+TELEMETRY ARANYA_EP ARANYA_ONBOARD_ANNOUNCE_TLM <%= CosmosCfsConfig::PROCESSOR_ENDIAN %> "ARANYA_EP_OnboardAnnounceTlm_t"
+  APPEND_ID_ITEM CCSDS_STREAMID       16 UINT 0x08A2  "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_ITEM    CCSDS_SEQUENCE       16 UINT         "CCSDS Packet Sequence Control" BIG_ENDIAN
+  APPEND_ITEM    CCSDS_LENGTH         16 UINT         "CCSDS Packet Data Length" BIG_ENDIAN
+  APPEND_ITEM    CCSDS_SECONDS        32 UINT         "CCSDS Telemetry Secondary Header (seconds)" BIG_ENDIAN
+  APPEND_ITEM    CCSDS_SUBSECS        16 UINT         "CCSDS Telemetry Secondary Header (subseconds)" BIG_ENDIAN
+  APPEND_ITEM    CCSDS_SPARE          32 UINT         ""
+
+  APPEND_ITEM    DEVICE_ID          1024 STRING       "Human-readable device ID string"
+  APPEND_ITEM    KEYBUNDLE_LEN        32 UINT         "Serialized key bundle length (bytes)"
+  APPEND_ITEM    KEYBUNDLE_HASH      520 STRING       "Hex-encoded key bundle hash"

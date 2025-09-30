@@ -94,6 +94,7 @@ typedef struct
     AranyaClient        Client;     /* Aranya client instance */
     bool                ClientInitialized; /* Flag indicating if Aranya client is initialized */
     char                DeviceIdStr[ARANYA_ID_STR_LEN]; /* Cached human-readable device ID */
+    uint32              KeyBundleLen; /* Cached keybundle length (bytes) for announcement */
 
     /*
     ** Application run status
