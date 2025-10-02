@@ -17,7 +17,9 @@
 ** TODO: Add additional commands required by the specific component
 */
 #define ARANYA_EP_NOOP_CC          0
-#define ARANYA_EP_RESET_CC          1
+#define ARANYA_EP_RESET_CC         1
+#define ARANYA_EP_EXP1_CC          2
+#define ARANYA_EP_EXP2_CC          3
 
 /*
 ** Telemetry Request Command Codes
@@ -34,7 +36,7 @@ typedef struct
     /* Every command requires a header used to identify it */
     CFE_MSG_CommandHeader_t CmdHeader;
 
-} ARANYA_EP_NoopCmd_t, ARANYA_EP_ResetCmd_t;
+} ARANYA_EP_NoopCmd_t, ARANYA_EP_ResetCmd_t, ARANYA_EP_Exp1Cmd_t, ARANYA_EP_Exp2Cmd_t;
 
 /*
 ** ARANYA_EP housekeeping packet definition
