@@ -102,84 +102,12 @@ void ARANYA_EP_ProcessGroundCommand(CFE_MSG_FcnCode_t FcnCode)
                               "Counters reset");
         }
         break;
-    case ARANYA_EP_SET_DEST_CC:
-        if (ARANYA_EP_VerifyCmdLength(&ARANYA_EP_App.SbBufPtr->Msg, sizeof(ARANYA_EP_SetDestCmd_t)) == CFE_SUCCESS)
-        {
-            ARANYA_EP_SetDestCmd_t *cmd = (ARANYA_EP_SetDestCmd_t*)ARANYA_EP_App.SbBufPtr;
-            ARANYA_EP_App.DestMsgId = CFE_SB_ValueToMsgId(cmd->DestMsgIdVal);
-            ARANYA_EP_App.DestSet = true;
-            ARANYA_EP_App.CmdCounter++;
-            CFE_EVS_SendEvent(ARANYA_EP_SETDEST_INF_EID, CFE_EVS_EventType_INFORMATION,
-                              "Dest MID=0x%08lX", (unsigned long)cmd->DestMsgIdVal);
-        }
-        break;
-    case ARANYA_EP_SET_UDS_CC:
-        if (ARANYA_EP_VerifyCmdLength(&ARANYA_EP_App.SbBufPtr->Msg, sizeof(ARANYA_EP_SetUdsCmd_t)) == CFE_SUCCESS)
-        {
-            ARANYA_EP_SetUdsCmd_t *cmd = (ARANYA_EP_SetUdsCmd_t*)ARANYA_EP_App.SbBufPtr;
-            if (ARANYA_EP_ValidateUdsPath(cmd->UdsPath))
-            {
-                strncpy(ARANYA_EP_App.UdsPath, cmd->UdsPath, sizeof(ARANYA_EP_App.UdsPath)-1);
-                ARANYA_EP_App.UdsPath[sizeof(ARANYA_EP_App.UdsPath)-1] = '\0';
-                CFE_EVS_SendEvent(ARANYA_EP_SOCKET_INF_EID, CFE_EVS_EventType_INFORMATION,
-                                  "UDS path set (applies next init): %s", ARANYA_EP_App.UdsPath);
-                ARANYA_EP_App.CmdCounter++;
-            }
-            else
-            {
-                ARANYA_EP_App.ErrCounter++;
-                CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
-                                  "Invalid UDS path");  
-            }                                                                                                                                           
-        }
-        break;
-    // case ARANYA_EP_FORWARD_CC:
-    // {
-    //     // Variable length; validate header portion first
-    //     size_t full_len = 0;
-    //     CFE_MSG_GetSize(&ARANYA_EP_App.SbBufPtr->Msg, &full_len);
-    //     if (full_len < (sizeof(ARANYA_EP_ForwardCmd_t) - ARANYA_EP_MAX_FORWARD_LEN))
-    //     {
-    //         ARANYA_EP_App.ErrCounter++;
-    //         CFE_EVS_SendEvent(ARANYA_EP_LEN_ERR_EID, CFE_EVS_EventType_ERROR,
-    //                           "FORWARD too short (%lu)", (unsigned long)full_len);
-    //         break;
-    //     }
-    //     ARANYA_EP_ForwardCmd_t *cmd = (ARANYA_EP_ForwardCmd_t*)ARANYA_EP_App.SbBufPtr;
-    //     size_t expected = (sizeof(ARANYA_EP_ForwardCmd_t) - ARANYA_EP_MAX_FORWARD_LEN + cmd->PayloadLen);
-    //     if (cmd->PayloadLen > ARANYA_EP_MAX_FORWARD_LEN || full_len != expected)
-    //     {
-    //         ARANYA_EP_App.ErrCounter++;
-    //         CFE_EVS_SendEvent(ARANYA_EP_LEN_ERR_EID, CFE_EVS_EventType_ERROR,
-    //                           "FORWARD len mismatch got=%lu exp=%lu payload=%u",
-    //                           (unsigned long)full_len, (unsigned long)expected, cmd->PayloadLen);
-    //         break;
-    //     }
-    //     if (!ARANYA_EP_App.DestSet)
-    //     {
-    //         ARANYA_EP_App.ErrCounter++;
-    //         CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
-    //                           "FORWARD w/o destination");
-    //         break;
-    //     }
-    //     if (ARANYA_EP_AuthorizeForward())
-    //     {
-    //         ARANYA_EP_ForwardToDest(cmd);
-    //         ARANYA_EP_App.AuthorizedCount++;
-    //         ARANYA_EP_App.CmdCounter++;
-    //         CFE_EVS_SendEvent(ARANYA_EP_ROUTE_INF_EID, CFE_EVS_EventType_INFORMATION,
-    //                           "FORWARD -> MID=0x%08lX FC=%u LEN=%u",
-    //                           (unsigned long)CFE_SB_MsgIdToValue(ARANYA_EP_App.DestMsgId),
-    //                           cmd->DestFcnCode, cmd->PayloadLen);
-    //     }
-    //     else
-    //     {
-    //         ARANYA_EP_App.DeniedCount++;
-    //         CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
-    //                           "FORWARD denied");
-    //     }
-    //     break;
-    // }
+    // Removed: case ARANYA_EP_SET_DEST_CC: { ... } break;
+
+    // Removed: case ARANYA_EP_SET_UDS_CC: { ... } break;
+
+    // Forward handler remains commented out; no change.
+
     default:
         ARANYA_EP_App.ErrCounter++;
         CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR,

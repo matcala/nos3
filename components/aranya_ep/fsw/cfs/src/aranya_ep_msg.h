@@ -17,10 +17,7 @@
 ** TODO: Add additional commands required by the specific component
 */
 #define ARANYA_EP_NOOP_CC          0
-#define ARANYA_EP_RESET_CC         1
-#define ARANYA_EP_SET_DEST_CC      2
-#define ARANYA_EP_SET_UDS_CC       3
-#define ARANYA_EP_FORWARD_CC       4
+#define ARANYA_EP_RESET_CC          1
 
 /*
 ** Telemetry Request Command Codes
@@ -38,25 +35,6 @@ typedef struct
     CFE_MSG_CommandHeader_t CmdHeader;
 
 } ARANYA_EP_NoopCmd_t, ARANYA_EP_ResetCmd_t;
-
-/* 
-** Set destination (SB MsgId encoded as a 32-bit atom for portability) 
-*/
-typedef struct
-{
-    CFE_MSG_CommandHeader_t CmdHeader;
-    uint32                  DestMsgIdVal;  /* use CFE_SB_ValueToMsgId at runtime */
-} ARANYA_EP_SetDestCmd_t;
-
-/* 
-** Set UDS path (fixed-size string; null-terminated if shorter)
-*/
-typedef struct
-{
-    CFE_MSG_CommandHeader_t CmdHeader;
-    char                    UdsPath[128];
-} ARANYA_EP_SetUdsCmd_t;
-
 
 /*
 ** ARANYA_EP housekeeping packet definition
