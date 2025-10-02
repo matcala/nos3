@@ -36,7 +36,14 @@ typedef struct
     /* Every command requires a header used to identify it */
     CFE_MSG_CommandHeader_t CmdHeader;
 
-} ARANYA_EP_NoopCmd_t, ARANYA_EP_ResetCmd_t, ARANYA_EP_Exp1Cmd_t, ARANYA_EP_Exp2Cmd_t;
+} ARANYA_EP_NoopCmd_t, ARANYA_EP_ResetCmd_t;
+
+/* EXP1 command with 128-byte payload */
+typedef struct
+{
+    CFE_MSG_CommandHeader_t CmdHeader;
+    uint8                   Data[128];
+} ARANYA_EP_Exp1Cmd_t, ARANYA_EP_Exp2Cmd_t;
 
 /*
 ** ARANYA_EP housekeeping packet definition

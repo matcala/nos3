@@ -102,12 +102,24 @@ void ARANYA_EP_ProcessGroundCommand(CFE_MSG_FcnCode_t FcnCode)
                               "Counters reset");
         }
         break;
-    // Removed: case ARANYA_EP_SET_DEST_CC: { ... } break;
-
-    // Removed: case ARANYA_EP_SET_UDS_CC: { ... } break;
-
-    // Forward handler remains commented out; no change.
-
+    case ARANYA_EP_EXP1_CC:
+        if (ARANYA_EP_VerifyCmdLength(&ARANYA_EP_App.SbBufPtr->Msg, sizeof(ARANYA_EP_Exp1Cmd_t)) == CFE_SUCCESS)
+        {
+            // ARANYA_EP_Exp1Cmd_t *cmd = (ARANYA_EP_Exp1Cmd_t*)ARANYA_EP_App.SbBufPtr; // if needed
+            ARANYA_EP_App.CmdCounter++;
+            CFE_EVS_SendEvent(ARANYA_EP_EXP1_INF_EID, CFE_EVS_EventType_INFORMATION,
+                              "EXP1 command received");
+        }
+        break;
+    case ARANYA_EP_EXP2_CC:
+        if (ARANYA_EP_VerifyCmdLength(&ARANYA_EP_App.SbBufPtr->Msg, sizeof(ARANYA_EP_Exp2Cmd_t)) == CFE_SUCCESS)
+        {
+            // ARANYA_EP_Exp2Cmd_t *cmd = (ARANYA_EP_Exp2Cmd_t*)ARANYA_EP_App.SbBufPtr; // if needed
+            ARANYA_EP_App.CmdCounter++;
+            CFE_EVS_SendEvent(ARANYA_EP_EXP2_INF_EID, CFE_EVS_EventType_INFORMATION,
+                              "EXP2 command received");
+        }
+        break;
     default:
         ARANYA_EP_App.ErrCounter++;
         CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
