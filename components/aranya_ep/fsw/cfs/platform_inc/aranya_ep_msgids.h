@@ -12,14 +12,13 @@
 /*
 ** CCSDS V1 Command Message IDs (MID) must be 0x18xx
 */
-#define ARANYA_EP_CMD_MID          0x18A0
-#define ARANYA_EP_SEND_HK_MID      0x18A1
-
+#define ARANYA_EP_CMD_MID     0x18A0
+#define ARANYA_EP_SEND_HK_MID 0x18A1
 
 /*
 ** CCSDS V1 Telemetry Message IDs must be 0x08xx
 */
-#define ARANYA_EP_HK_TLM_MID             0x08A0
-#define ARANYA_EP_ONBOARD_ANNOUNCE_TLM_MID 0x08A2 
+#define ARANYA_EP_HK_TLM_MID               0x08A0
+#define ARANYA_EP_ONBOARD_ANNOUNCE_TLM_MID 0x08A2
 
 #endif /* _ARANYA_EP_MSGIDS_H_ */

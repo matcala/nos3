@@ -16,18 +16,18 @@ Look at SAMPLE_APP_EVENTS.H for reference
 */
 
 /* Event ID assignments */
-#define ARANYA_EP_INIT_INF_EID        1
-#define ARANYA_EP_NOOP_INF_EID        2
-#define ARANYA_EP_RESET_INF_EID       3
-#define ARANYA_EP_CMD_ERR_EID        10
-#define ARANYA_EP_LEN_ERR_EID        11
-#define ARANYA_EP_ARANYA_ERR_EID     12
-#define ARANYA_EP_ROUTE_INF_EID      13
-#define ARANYA_EP_SOCKET_INF_EID     15
-#define ARANYA_EP_EXP1_INF_EID       16
-#define ARANYA_EP_EXP2_INF_EID       17
+#define ARANYA_EP_INIT_INF_EID   1
+#define ARANYA_EP_NOOP_INF_EID   2
+#define ARANYA_EP_RESET_INF_EID  3
+#define ARANYA_EP_CMD_ERR_EID    10
+#define ARANYA_EP_LEN_ERR_EID    11
+#define ARANYA_EP_ARANYA_ERR_EID 12
+#define ARANYA_EP_ROUTE_INF_EID  13
+#define ARANYA_EP_SOCKET_INF_EID 15
+#define ARANYA_EP_EXP1_INF_EID   16
+#define ARANYA_EP_EXP2_INF_EID   17
 
 /* DEBUG: Housekeeping telemetry successfully sent */
-#define ARANYA_EP_HK_SENT_EID  0x00F0 
+#define ARANYA_EP_HK_SENT_EID 0x00F0
 
 #endif /* _ARANYA_EP_EVENTS_H_ */

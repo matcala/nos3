@@ -16,10 +16,10 @@
 ** Ground Command Codes
 ** TODO: Add additional commands required by the specific component
 */
-#define ARANYA_EP_NOOP_CC          0
-#define ARANYA_EP_RESET_CC         1
-#define ARANYA_EP_EXP1_CC          2
-#define ARANYA_EP_EXP2_CC          3
+#define ARANYA_EP_NOOP_CC  0
+#define ARANYA_EP_RESET_CC 1
+#define ARANYA_EP_EXP1_CC  2
+#define ARANYA_EP_EXP2_CC  3
 
 /*
 ** Telemetry Request Command Codes
@@ -55,8 +55,8 @@ typedef struct
     uint8                     ErrCounter;
     uint32                    AuthorizedCount;
     uint32                    DeniedCount;
-    uint32                    LastAuthResult;  /* 0=unknown, 1=authorized, 2=denied, 3=aranya_err */
-    uint32                    DestMsgIdVal;    /* current destination MID value */
+    uint32                    LastAuthResult; /* 0=unknown, 1=authorized, 2=denied, 3=aranya_err */
+    uint32                    DestMsgIdVal;   /* current destination MID value */
 
 } __attribute__((packed)) ARANYA_EP_HkTlm_t;
 #define ARANYA_EP_HK_LNGTH sizeof(ARANYA_EP_HkTlm_t)
@@ -69,12 +69,12 @@ typedef struct
 {
     CFE_MSG_TelemetryHeader_t TlmHeader;
     /* Human-readable device ID (null-terminated) */
-    char   DeviceId[128];
+    char DeviceId[128];
     /* Serialized key bundle length in bytes */
     uint32 KeyBundleLen;
     /* Hex-encoded hash string of the key bundle (null-terminated).
        Using 64-bit FNV-1a -> 16 hex chars + NUL (up to 65 reserved for future expansion) */
-    char   KeyBundleHash[65];
+    char KeyBundleHash[65];
 
 } __attribute__((packed)) ARANYA_EP_OnboardAnnounceTlm_t;
 #define ARANYA_EP_ONBOARD_ANNOUNCE_LNGTH sizeof(ARANYA_EP_OnboardAnnounceTlm_t)

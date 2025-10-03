@@ -41,8 +41,8 @@ void ARANYA_EP_AppMain(void)
         }
         else
         {
-            CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "ReceiveBuffer failed: 0x%08lX", (unsigned long)status);
+            CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR, "ReceiveBuffer failed: 0x%08lX",
+                              (unsigned long)status);
         }
     }
 
@@ -53,7 +53,7 @@ void ARANYA_EP_AppMain(void)
 /* Process incoming SB message(s) */
 void ARANYA_EP_ProcessCommand(void)
 {
-    CFE_SB_MsgId_t   msgid = CFE_SB_INVALID_MSG_ID;
+    CFE_SB_MsgId_t    msgid = CFE_SB_INVALID_MSG_ID;
     CFE_MSG_FcnCode_t fcode = 0;
 
     CFE_MSG_GetMsgId(&ARANYA_EP_App.SbBufPtr->Msg, &msgid);
@@ -70,8 +70,7 @@ void ARANYA_EP_ProcessCommand(void)
     else
     {
         ARANYA_EP_App.ErrCounter++;
-        CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "Invalid MsgId: 0x%08lX",
+        CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR, "Invalid MsgId: 0x%08lX",
                           (unsigned long)CFE_SB_MsgIdToValue(msgid));
     }
 }
@@ -81,73 +80,67 @@ void ARANYA_EP_ProcessGroundCommand(CFE_MSG_FcnCode_t FcnCode)
 {
     switch (FcnCode)
     {
-    case ARANYA_EP_NOOP_CC:
-        if (ARANYA_EP_VerifyCmdLength(&ARANYA_EP_App.SbBufPtr->Msg, sizeof(ARANYA_EP_NoopCmd_t)) == CFE_SUCCESS)
-        {
-            ARANYA_EP_App.CmdCounter++;
-            CFE_EVS_SendEvent(ARANYA_EP_NOOP_INF_EID, CFE_EVS_EventType_INFORMATION,
-                              "NOOP v%u.%u.%u.%u",
-                              ARANYA_EP_MAJOR_VERSION, ARANYA_EP_MINOR_VERSION,
-                              ARANYA_EP_REVISION, ARANYA_EP_MISSION_REV);
-        }
-        break;
-    case ARANYA_EP_RESET_CC:
-        if (ARANYA_EP_VerifyCmdLength(&ARANYA_EP_App.SbBufPtr->Msg, sizeof(ARANYA_EP_ResetCmd_t)) == CFE_SUCCESS)
-        {
-            ARANYA_EP_App.CmdCounter = 0;
-            ARANYA_EP_App.ErrCounter = 0;
-            ARANYA_EP_App.AuthorizedCount = 0;
-            ARANYA_EP_App.DeniedCount = 0;
-            ARANYA_EP_App.LastAuthResult = ARANYA_EP_AUTH_UNKNOWN;
-            CFE_EVS_SendEvent(ARANYA_EP_RESET_INF_EID, CFE_EVS_EventType_INFORMATION,
-                              "Counters reset");
-        }
-        break;
-    case ARANYA_EP_EXP1_CC:
-        if (ARANYA_EP_VerifyCmdLength(&ARANYA_EP_App.SbBufPtr->Msg, sizeof(ARANYA_EP_Exp1Cmd_t)) == CFE_SUCCESS)
-        {
-            // ARANYA_EP_Exp1Cmd_t *cmd = (ARANYA_EP_Exp1Cmd_t*)ARANYA_EP_App.SbBufPtr; // if needed
-
-            ARANYA_EP_App.CmdCounter++;
-            CFE_EVS_SendEvent(ARANYA_EP_EXP1_INF_EID, CFE_EVS_EventType_INFORMATION,
-                              "EXP1 command received");
-                              
-            OS_printf("[ARANYA_EP_CAM] Enforcing policy on CMD EXP1...\n");
-            OS_printf("[ARANYA_EP_CAM] Command Accepted, instructing CAM Payload...\n");
-
-            CAM_NoArgsCmd_t cam_cmd;
-            CFE_Status_t cam_status;
-
-            CFE_MSG_Init(CFE_MSG_PTR(cam_cmd.CmdHeader), CFE_SB_ValueToMsgId(CAM_CMD_MID), CAM_NOARGSCMD_LNGTH);
-            CFE_MSG_SetFcnCode(CFE_MSG_PTR(cam_cmd.CmdHeader), CAM_EXP1_CC);
-            cam_status = CFE_SB_TransmitMsg(CFE_MSG_PTR(cam_cmd.CmdHeader), true);
-
-            if (cam_status != CFE_SUCCESS)
+        case ARANYA_EP_NOOP_CC:
+            if (ARANYA_EP_VerifyCmdLength(&ARANYA_EP_App.SbBufPtr->Msg, sizeof(ARANYA_EP_NoopCmd_t)) == CFE_SUCCESS)
             {
-                ARANYA_EP_App.ErrCounter++;
-                CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
-                                  "Failed to send CAM capture command: 0x%08lX", (unsigned long)cam_status);
+                ARANYA_EP_App.CmdCounter++;
+                CFE_EVS_SendEvent(ARANYA_EP_NOOP_INF_EID, CFE_EVS_EventType_INFORMATION, "NOOP v%u.%u.%u.%u",
+                                  ARANYA_EP_MAJOR_VERSION, ARANYA_EP_MINOR_VERSION, ARANYA_EP_REVISION,
+                                  ARANYA_EP_MISSION_REV);
             }
-            else
+            break;
+        case ARANYA_EP_RESET_CC:
+            if (ARANYA_EP_VerifyCmdLength(&ARANYA_EP_App.SbBufPtr->Msg, sizeof(ARANYA_EP_ResetCmd_t)) == CFE_SUCCESS)
             {
-                OS_printf("[ARANYA_EP_CAM] CAM capture command transmitted.\n");
+                ARANYA_EP_App.CmdCounter      = 0;
+                ARANYA_EP_App.ErrCounter      = 0;
+                ARANYA_EP_App.AuthorizedCount = 0;
+                ARANYA_EP_App.DeniedCount     = 0;
+                ARANYA_EP_App.LastAuthResult  = ARANYA_EP_AUTH_UNKNOWN;
+                CFE_EVS_SendEvent(ARANYA_EP_RESET_INF_EID, CFE_EVS_EventType_INFORMATION, "Counters reset");
             }
+            break;
+        case ARANYA_EP_EXP1_CC:
+            if (ARANYA_EP_VerifyCmdLength(&ARANYA_EP_App.SbBufPtr->Msg, sizeof(ARANYA_EP_Exp1Cmd_t)) == CFE_SUCCESS)
+            {
+                // ARANYA_EP_Exp1Cmd_t *cmd = (ARANYA_EP_Exp1Cmd_t*)ARANYA_EP_App.SbBufPtr; // if needed
 
-        }
-        break;
-    case ARANYA_EP_EXP2_CC:
-        if (ARANYA_EP_VerifyCmdLength(&ARANYA_EP_App.SbBufPtr->Msg, sizeof(ARANYA_EP_Exp2Cmd_t)) == CFE_SUCCESS)
-        {
-            // ARANYA_EP_Exp2Cmd_t *cmd = (ARANYA_EP_Exp2Cmd_t*)ARANYA_EP_App.SbBufPtr; // if needed
-            ARANYA_EP_App.CmdCounter++;
-            CFE_EVS_SendEvent(ARANYA_EP_EXP2_INF_EID, CFE_EVS_EventType_INFORMATION,
-                              "EXP2 command received");
-        }
-        break;
-    default:
-        ARANYA_EP_App.ErrCounter++;
-        CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "Invalid CC=%u", (unsigned)FcnCode);
-        break;
+                ARANYA_EP_App.CmdCounter++;
+                CFE_EVS_SendEvent(ARANYA_EP_EXP1_INF_EID, CFE_EVS_EventType_INFORMATION, "EXP1 command received");
+
+                OS_printf("[ARANYA_EP_CAM] Enforcing policy on CMD EXP1...\n");
+                OS_printf("[ARANYA_EP_CAM] Command Accepted, instructing CAM Payload...\n");
+
+                CAM_NoArgsCmd_t cam_cmd;
+                CFE_Status_t    cam_status;
+
+                CFE_MSG_Init(CFE_MSG_PTR(cam_cmd.CmdHeader), CFE_SB_ValueToMsgId(CAM_CMD_MID), CAM_NOARGSCMD_LNGTH);
+                CFE_MSG_SetFcnCode(CFE_MSG_PTR(cam_cmd.CmdHeader), CAM_EXP1_CC);
+                cam_status = CFE_SB_TransmitMsg(CFE_MSG_PTR(cam_cmd.CmdHeader), true);
+
+                if (cam_status != CFE_SUCCESS)
+                {
+                    ARANYA_EP_App.ErrCounter++;
+                    CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
+                                      "Failed to send CAM capture command: 0x%08lX", (unsigned long)cam_status);
+                }
+                else
+                {
+                    OS_printf("[ARANYA_EP_CAM] CAM capture command transmitted.\n");
+                }
+            }
+            break;
+        case ARANYA_EP_EXP2_CC:
+            if (ARANYA_EP_VerifyCmdLength(&ARANYA_EP_App.SbBufPtr->Msg, sizeof(ARANYA_EP_Exp2Cmd_t)) == CFE_SUCCESS)
+            {
+                // ARANYA_EP_Exp2Cmd_t *cmd = (ARANYA_EP_Exp2Cmd_t*)ARANYA_EP_App.SbBufPtr; // if needed
+                ARANYA_EP_App.CmdCounter++;
+                CFE_EVS_SendEvent(ARANYA_EP_EXP2_INF_EID, CFE_EVS_EventType_INFORMATION, "EXP2 command received");
+            }
+            break;
+        default:
+            ARANYA_EP_App.ErrCounter++;
+            CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR, "Invalid CC=%u", (unsigned)FcnCode);
+            break;
     }
 }

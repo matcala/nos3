@@ -8,7 +8,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <stdarg.h>  /* added for va_list */
+#include <stdarg.h> /* added for va_list */
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -44,8 +44,8 @@ bool ARANYA_EP_InitAranya(void)
     AranyaError rc;
 
     /* Track successful builder inits to decide if cleanup is safe */
-    //TODO: cleanup all these inited checks, technically not necessary. See example.c
-    bool aqc_builder_inited = false;
+    // TODO: cleanup all these inited checks, technically not necessary. See example.c
+    bool aqc_builder_inited        = false;
     bool client_cfg_builder_inited = false;
 
     /* Build AQC config */
@@ -53,16 +53,14 @@ bool ARANYA_EP_InitAranya(void)
     rc = aranya_aqc_config_builder_init(&aqc_builder);
     if (rc != ARANYA_ERROR_SUCCESS)
     {
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "AQC config builder init failed (%d)", rc);
+        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "AQC config builder init failed (%d)", rc);
         return false; /* do NOT cleanup if init failed */
     }
     aqc_builder_inited = true;
-    rc = aranya_aqc_config_builder_set_address(&aqc_builder, ARANYA_EP_DEFAULT_AQC_ADDR);
+    rc                 = aranya_aqc_config_builder_set_address(&aqc_builder, ARANYA_EP_DEFAULT_AQC_ADDR);
     if (rc != ARANYA_ERROR_SUCCESS)
     {
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "AQC set address failed (%d)", rc);
+        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "AQC set address failed (%d)", rc);
         aranya_aqc_config_builder_cleanup(&aqc_builder);
         return false;
     }
@@ -71,10 +69,10 @@ bool ARANYA_EP_InitAranya(void)
     rc = aranya_aqc_config_build(&aqc_builder, &aqc_cfg);
     if (rc != ARANYA_ERROR_SUCCESS)
     {
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "AQC config build failed (%d)", rc);
+        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "AQC config build failed (%d)", rc);
         /* builder consumed only on success; safe to cleanup here */
-        if (aqc_builder_inited) aranya_aqc_config_builder_cleanup(&aqc_builder);
+        if (aqc_builder_inited)
+            aranya_aqc_config_builder_cleanup(&aqc_builder);
         return false;
     }
 
@@ -83,28 +81,28 @@ bool ARANYA_EP_InitAranya(void)
     rc = aranya_client_config_builder_init(&client_cfg_builder);
     if (rc != ARANYA_ERROR_SUCCESS)
     {
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "Client config builder init failed (%d)", rc);
+        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "Client config builder init failed (%d)",
+                          rc);
         return false;
     }
 
-    //OS_printf("Using Aranya daemon UDS path: %s\n", ARANYA_EP_DEFAULT_UDS_PATH);
+    // OS_printf("Using Aranya daemon UDS path: %s\n", ARANYA_EP_DEFAULT_UDS_PATH);
     client_cfg_builder_inited = true;
     rc = aranya_client_config_builder_set_daemon_uds_path(&client_cfg_builder, ARANYA_EP_DEFAULT_UDS_PATH);
     if (rc != ARANYA_ERROR_SUCCESS)
     {
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "Set daemon UDS path failed (%d)", rc);
-        if (client_cfg_builder_inited) aranya_client_config_builder_cleanup(&client_cfg_builder);
+        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "Set daemon UDS path failed (%d)", rc);
+        if (client_cfg_builder_inited)
+            aranya_client_config_builder_cleanup(&client_cfg_builder);
         return false;
     }
 
     rc = aranya_client_config_builder_set_aqc_config(&client_cfg_builder, &aqc_cfg);
     if (rc != ARANYA_ERROR_SUCCESS)
     {
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "Set AQC config failed (%d)", rc);
-        if (client_cfg_builder_inited) aranya_client_config_builder_cleanup(&client_cfg_builder);
+        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "Set AQC config failed (%d)", rc);
+        if (client_cfg_builder_inited)
+            aranya_client_config_builder_cleanup(&client_cfg_builder);
         return false;
     }
     // Consumed on build.
@@ -112,11 +110,10 @@ bool ARANYA_EP_InitAranya(void)
     rc = aranya_client_config_build(&client_cfg_builder, &client_cfg);
     if (rc != ARANYA_ERROR_SUCCESS)
     {
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "Client config build failed (%d)", rc);
+        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "Client config build failed (%d)", rc);
         return false;
     }
-    
+
     /* Initialize client */
     AranyaExtError ext_err;
     memset(&ext_err, 0, sizeof(ext_err));
@@ -126,7 +123,7 @@ bool ARANYA_EP_InitAranya(void)
         size_t err_len = 0;
         aranya_ext_error_msg(&ext_err, NULL, &err_len); /* query needed size */
         const char *fallback = "unknown";
-        char *buf = NULL;
+        char       *buf      = NULL;
         if (err_len > 0 && err_len < 4096) /* sanity cap */
         {
             buf = (char *)malloc(err_len);
@@ -140,10 +137,10 @@ bool ARANYA_EP_InitAranya(void)
             }
         }
 
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "aranya_client_init failed (%d): %s", rc,
+        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "aranya_client_init failed (%d): %s", rc,
                           buf ? buf : fallback);
-        if (buf) free(buf);
+        if (buf)
+            free(buf);
 
         return false;
     }
@@ -152,9 +149,9 @@ bool ARANYA_EP_InitAranya(void)
     rc = aranya_get_device_id(&ARANYA_EP_App.Client, &dev_id);
     if (rc == ARANYA_ERROR_SUCCESS)
     {
-        char   dev_str[ARANYA_ID_STR_LEN] = {0};
-        size_t dev_str_len                = sizeof(dev_str);
-        AranyaError rc2                   = aranya_id_to_str(&dev_id.id, dev_str, &dev_str_len);
+        char        dev_str[ARANYA_ID_STR_LEN] = {0};
+        size_t      dev_str_len                = sizeof(dev_str);
+        AranyaError rc2                        = aranya_id_to_str(&dev_id.id, dev_str, &dev_str_len);
         if (rc2 == ARANYA_ERROR_SUCCESS)
         {
             /* Cache device ID string for later telemetry use */
@@ -181,12 +178,12 @@ bool ARANYA_EP_InitAranya(void)
 
     /* Retrieve keybundle using non-NULL buffer pattern */
     ARANYA_EP_App.KeyBundleLen = 0; /* reset cached length before fetch */
-    size_t kb_len = 1;
-    uint8_t *kb = (uint8_t *)calloc(kb_len, 1);
+    size_t   kb_len            = 1;
+    uint8_t *kb                = (uint8_t *)calloc(kb_len, 1);
     if (kb == NULL)
     {
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "Keybundle initial alloc failed (len=%lu)", (unsigned long)kb_len);
+        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "Keybundle initial alloc failed (len=%lu)",
+                          (unsigned long)kb_len);
     }
     else
     {
@@ -227,9 +224,8 @@ bool ARANYA_EP_InitAranya(void)
 
                         const char *kb_path = "/data/aranya/keybundle.bin";
                         osal_id_t   fd      = OS_OBJECT_ID_UNDEFINED;
-                        int32       rc_open = OS_OpenCreate(&fd, kb_path,
-                                                            OS_FILE_FLAG_CREATE | OS_FILE_FLAG_TRUNCATE,
-                                                            OS_READ_WRITE);
+                        int32       rc_open =
+                            OS_OpenCreate(&fd, kb_path, OS_FILE_FLAG_CREATE | OS_FILE_FLAG_TRUNCATE, OS_READ_WRITE);
                         if (rc_open == OS_SUCCESS)
                         {
                             int32 rc_wr = OS_write(fd, kb, (size_t)kb_len);
@@ -241,8 +237,8 @@ bool ARANYA_EP_InitAranya(void)
                             else
                             {
                                 CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                                                  "Keybundle write failed (%ld/%lu) to %s",
-                                                  (long)rc_wr, (unsigned long)kb_len, kb_path);
+                                                  "Keybundle write failed (%ld/%lu) to %s", (long)rc_wr,
+                                                  (unsigned long)kb_len, kb_path);
                             }
                             (void)OS_close(fd);
                         }
@@ -271,7 +267,8 @@ bool ARANYA_EP_InitAranya(void)
                         }
                         CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
                                           "Keybundle fetch failed (%d): %s", krc, ebuf ? ebuf : "unknown");
-                        if (ebuf) free(ebuf);
+                        if (ebuf)
+                            free(ebuf);
                     }
                 }
             }
@@ -285,9 +282,7 @@ bool ARANYA_EP_InitAranya(void)
             (void)OS_mkdir("/data/aranya", OS_DEFAULT_FILE_PERMISSIONS);
             const char *kb_path = "/data/aranya/keybundle.bin";
             osal_id_t   fd      = OS_OBJECT_ID_UNDEFINED;
-            int32       rc_open = OS_OpenCreate(&fd, kb_path,
-                                                OS_FILE_FLAG_CREATE | OS_FILE_FLAG_TRUNCATE,
-                                                OS_READ_WRITE);
+            int32 rc_open = OS_OpenCreate(&fd, kb_path, OS_FILE_FLAG_CREATE | OS_FILE_FLAG_TRUNCATE, OS_READ_WRITE);
             if (rc_open == OS_SUCCESS)
             {
                 int32 rc_wr = OS_write(fd, kb, (size_t)kb_len);
@@ -299,8 +294,8 @@ bool ARANYA_EP_InitAranya(void)
                 else
                 {
                     CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                                      "Keybundle write failed (%ld/%lu) to %s",
-                                      (long)rc_wr, (unsigned long)kb_len, kb_path);
+                                      "Keybundle write failed (%ld/%lu) to %s", (long)rc_wr, (unsigned long)kb_len,
+                                      kb_path);
                 }
                 (void)OS_close(fd);
             }
@@ -327,12 +322,14 @@ bool ARANYA_EP_InitAranya(void)
                     }
                 }
             }
-            CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "Keybundle fetch failed (%d): %s", krc, ebuf ? ebuf : "unknown");
-            if (ebuf) free(ebuf);
+            CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "Keybundle fetch failed (%d): %s", krc,
+                              ebuf ? ebuf : "unknown");
+            if (ebuf)
+                free(ebuf);
         }
 
-        if (kb) free(kb);
+        if (kb)
+            free(kb);
     }
 
     ARANYA_EP_App.ClientInitialized = true;
@@ -352,18 +349,22 @@ int32 ARANYA_EP_Init(void)
     ARANYA_EP_App.DestMsgId = CFE_SB_INVALID_MSG_ID;
 
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
-    if (status != CFE_SUCCESS) return status;
+    if (status != CFE_SUCCESS)
+        return status;
 
     ARANYA_EP_AranyaLibTest();
 
     status = CFE_SB_CreatePipe(&ARANYA_EP_App.CmdPipeId, ARANYA_EP_PIPE_DEPTH, "ARANYA_EP_CMD_PIPE");
-    if (status != CFE_SUCCESS) return status;
+    if (status != CFE_SUCCESS)
+        return status;
 
     status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(ARANYA_EP_CMD_MID), ARANYA_EP_App.CmdPipeId);
-    if (status != CFE_SUCCESS) return status;
+    if (status != CFE_SUCCESS)
+        return status;
 
     status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(ARANYA_EP_SEND_HK_MID), ARANYA_EP_App.CmdPipeId);
-    if (status != CFE_SUCCESS) return status;
+    if (status != CFE_SUCCESS)
+        return status;
 
     ARANYA_EP_App.RunStatus = CFE_ES_RunStatus_APP_RUN;
     /* Copy default UDS path safely ensuring null-termination */
@@ -373,9 +374,8 @@ int32 ARANYA_EP_Init(void)
     if (ARANYA_EP_InitAranya())
     {
         CFE_EVS_SendEvent(ARANYA_EP_INIT_INF_EID, CFE_EVS_EventType_INFORMATION,
-                          "ARANYA_EP v%u.%u.%u.%u initialized, UDS:%s",
-                          ARANYA_EP_MAJOR_VERSION, ARANYA_EP_MINOR_VERSION,
-                          ARANYA_EP_REVISION, ARANYA_EP_MISSION_REV, ARANYA_EP_App.UdsPath);
+                          "ARANYA_EP v%u.%u.%u.%u initialized, UDS:%s", ARANYA_EP_MAJOR_VERSION,
+                          ARANYA_EP_MINOR_VERSION, ARANYA_EP_REVISION, ARANYA_EP_MISSION_REV, ARANYA_EP_App.UdsPath);
         OS_printf("[ARANYA_EP] Initialized. Daemon UDS=%s\n", ARANYA_EP_App.UdsPath);
     }
     else
@@ -394,9 +394,7 @@ void ARANYA_EP_SendHousekeeping(void)
     /* Use persistent packet to avoid dangling pointer after return */
     ARANYA_EP_HkTlm_t *hk = &ARANYA_EP_HkPkt;
     memset(hk, 0, sizeof(*hk));
-    CFE_MSG_Init(CFE_MSG_PTR(hk->TlmHeader), 
-                CFE_SB_ValueToMsgId(ARANYA_EP_HK_TLM_MID), 
-                sizeof(*hk));
+    CFE_MSG_Init(CFE_MSG_PTR(hk->TlmHeader), CFE_SB_ValueToMsgId(ARANYA_EP_HK_TLM_MID), sizeof(*hk));
 
     hk->CmdCounter      = ARANYA_EP_App.CmdCounter;
     hk->ErrCounter      = ARANYA_EP_App.ErrCounter;
@@ -409,8 +407,8 @@ void ARANYA_EP_SendHousekeeping(void)
     if (tx_status == CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(ARANYA_EP_HK_SENT_EID, CFE_EVS_EventType_INFORMATION,
-                          "HK telemetry sent: CmdCnt=%u ErrCnt=%u DestMID=0x%08lX",
-                          hk->CmdCounter, hk->ErrCounter, (unsigned long)hk->DestMsgIdVal);
+                          "HK telemetry sent: CmdCnt=%u ErrCnt=%u DestMID=0x%08lX", hk->CmdCounter, hk->ErrCounter,
+                          (unsigned long)hk->DestMsgIdVal);
     }
 
     // TODO: remove, here temporarily for debugging
@@ -422,36 +420,34 @@ void ARANYA_EP_SendOnboardAnnounce(void)
 {
     ARANYA_EP_OnboardAnnounceTlm_t *onb_announcement = &ARANYA_EP_AnnouncePkt;
     memset(onb_announcement, 0, sizeof(*onb_announcement));
-    CFE_MSG_Init(CFE_MSG_PTR(onb_announcement->TlmHeader),
-                 CFE_SB_ValueToMsgId(ARANYA_EP_ONBOARD_ANNOUNCE_TLM_MID),
+    CFE_MSG_Init(CFE_MSG_PTR(onb_announcement->TlmHeader), CFE_SB_ValueToMsgId(ARANYA_EP_ONBOARD_ANNOUNCE_TLM_MID),
                  sizeof(*onb_announcement));
 
     /* Device ID string from cached AppData value */
     if (ARANYA_EP_App.DeviceIdStr[0] != '\0')
     {
-        (void)snprintf(onb_announcement->DeviceId, 
-                        sizeof(onb_announcement->DeviceId), 
-                        "%s", ARANYA_EP_App.DeviceIdStr);
+        (void)snprintf(onb_announcement->DeviceId, sizeof(onb_announcement->DeviceId), "%s", ARANYA_EP_App.DeviceIdStr);
     }
 
     /* Use cached keybundle metadata collected in InitAranya */
-    onb_announcement->KeyBundleLen = ARANYA_EP_App.KeyBundleLen;
+    onb_announcement->KeyBundleLen     = ARANYA_EP_App.KeyBundleLen;
     onb_announcement->KeyBundleHash[0] = '\0'; /* TODO: populate when available */
 
     int32 tx_status = CFE_SB_TransmitMsg((CFE_MSG_Message_t *)onb_announcement, true);
     if (tx_status == CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(ARANYA_EP_HK_SENT_EID, CFE_EVS_EventType_INFORMATION,
-                          "ONBOARDING telemetry sent.");
+        CFE_EVS_SendEvent(ARANYA_EP_HK_SENT_EID, CFE_EVS_EventType_INFORMATION, "ONBOARDING telemetry sent.");
     }
 }
 
 bool ARANYA_EP_ValidateUdsPath(const char *Path)
 {
-    if (Path == NULL || Path[0] != '/') return false;
+    if (Path == NULL || Path[0] != '/')
+        return false;
     for (const char *p = Path; *p != '\0'; ++p)
     {
-        if ((unsigned char)*p < 0x20) return false;
+        if ((unsigned char)*p < 0x20)
+            return false;
     }
     return true;
 }
@@ -467,31 +463,27 @@ int32 ARANYA_EP_VerifyCmdLength(CFE_MSG_Message_t *MsgPtr, size_t Expected)
         CFE_MSG_GetMsgId(MsgPtr, &mid);
         CFE_MSG_GetFcnCode(MsgPtr, &fc);
         CFE_EVS_SendEvent(ARANYA_EP_LEN_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "Length error MID=0x%08lX FC=%u Got=%lu Exp=%lu",
-                          (unsigned long)CFE_SB_MsgIdToValue(mid), (unsigned)fc,
-                          (unsigned long)actual, (unsigned long)Expected);
+                          "Length error MID=0x%08lX FC=%u Got=%lu Exp=%lu", (unsigned long)CFE_SB_MsgIdToValue(mid),
+                          (unsigned)fc, (unsigned long)actual, (unsigned long)Expected);
         ARANYA_EP_App.ErrCounter++;
         return CFE_SB_BAD_ARGUMENT;
     }
     return CFE_SUCCESS;
 }
 
-int32 ARANYA_EP_MountAndList(const char *dev_name,
-                             const char *mount_point,
-                             const char *dir_path)
+int32 ARANYA_EP_MountAndList(const char *dev_name, const char *mount_point, const char *dir_path)
 {
-    int32 status;
-    osal_id_t dir_id;
+    int32       status;
+    osal_id_t   dir_id;
     os_dirent_t dirent;
-    bool mounted = false;
+    bool        mounted = false;
 
     if (dev_name && mount_point)
     {
         /* Heuristic: if dev_name looks like a host absolute path, skip OS_mount attempt */
         if (dev_name[0] == '/')
         {
-            OS_printf("ARANYA_EP: Skipping OS_mount; '%s' looks like a host path (dir='%s')\n",
-                      dev_name, dir_path);
+            OS_printf("ARANYA_EP: Skipping OS_mount; '%s' looks like a host path (dir='%s')\n", dev_name, dir_path);
         }
         else
         {
@@ -499,11 +491,9 @@ int32 ARANYA_EP_MountAndList(const char *dev_name,
             status = OS_mount(dev_name, mount_point);
             if (status != OS_SUCCESS)
             {
-                OS_printf("ARANYA_EP: OS_mount failed dev=%s mp=%s rc=%ld\n",
-                          dev_name, mount_point, (long)status);
+                OS_printf("ARANYA_EP: OS_mount failed dev=%s mp=%s rc=%ld\n", dev_name, mount_point, (long)status);
                 CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                                  "FS mount failed dev=%s mp=%s rc=%ld",
-                                  dev_name, mount_point, (long)status);
+                                  "FS mount failed dev=%s mp=%s rc=%ld", dev_name, mount_point, (long)status);
                 return status;
             }
             mounted = true;
@@ -513,10 +503,8 @@ int32 ARANYA_EP_MountAndList(const char *dev_name,
     status = OS_DirectoryOpen(&dir_id, dir_path);
     if (status != OS_SUCCESS)
     {
-        OS_printf("ARANYA_EP: Directory open failed path=%s rc=%ld\n",
-                  dir_path, (long)status);
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "Directory open failed path=%s rc=%ld",
+        OS_printf("ARANYA_EP: Directory open failed path=%s rc=%ld\n", dir_path, (long)status);
+        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "Directory open failed path=%s rc=%ld",
                           dir_path, (long)status);
         if (mounted)
             OS_unmount(mount_point);
@@ -540,8 +528,7 @@ int32 ARANYA_EP_MountAndList(const char *dev_name,
         status = OS_unmount(mount_point);
         if (status != OS_SUCCESS)
         {
-            CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "Unmount failed mp=%s rc=%ld",
+            CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "Unmount failed mp=%s rc=%ld",
                               mount_point, (long)status);
         }
     }
