@@ -25,7 +25,7 @@
 			<enable>true</enable>
 		</adcs>
 		<cam>
-			<enable>false</enable>
+			<enable>true</enable>
 		</cam>
 		<css>
 			<enable>true</enable>
@@ -52,13 +52,13 @@
 			<enable>false</enable>
 		</onair>
 		<radio>
-			<enable>true</enable>
+			<enable>false</enable>
 		</radio>
 		<rw>
 			<enable>true</enable>
 		</rw>
 		<sample>
-			<enable>true</enable>
+			<enable>false</enable>
 		</sample>
 		<st>
 			<enable>true</enable>

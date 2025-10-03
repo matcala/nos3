@@ -3,12 +3,13 @@
 #include "cfe_es.h"
 #include "cfe_sb.h"
 #include "cfe_msg.h"
-#include "osapi.h"
 
 #include "aranya_ep_app.h"
 #include "aranya_ep_utils.h"
 #include <string.h>
 #include <stdbool.h>
+
+#include "aranya_cam_interface.h"
 
 /* Global app data - defined here, declared extern in header */
 ARANYA_EP_AppData_t ARANYA_EP_App;
@@ -106,9 +107,32 @@ void ARANYA_EP_ProcessGroundCommand(CFE_MSG_FcnCode_t FcnCode)
         if (ARANYA_EP_VerifyCmdLength(&ARANYA_EP_App.SbBufPtr->Msg, sizeof(ARANYA_EP_Exp1Cmd_t)) == CFE_SUCCESS)
         {
             // ARANYA_EP_Exp1Cmd_t *cmd = (ARANYA_EP_Exp1Cmd_t*)ARANYA_EP_App.SbBufPtr; // if needed
+
             ARANYA_EP_App.CmdCounter++;
             CFE_EVS_SendEvent(ARANYA_EP_EXP1_INF_EID, CFE_EVS_EventType_INFORMATION,
                               "EXP1 command received");
+                              
+            OS_printf("[ARANYA_EP_CAM] Enforcing policy on CMD EXP1...\n");
+            OS_printf("[ARANYA_EP_CAM] Command Accepted, instructing CAM Payload...\n");
+
+            CAM_NoArgsCmd_t cam_cmd;
+            CFE_Status_t cam_status;
+
+            CFE_MSG_Init(CFE_MSG_PTR(cam_cmd.CmdHeader), CFE_SB_ValueToMsgId(CAM_CMD_MID), CAM_NOARGSCMD_LNGTH);
+            CFE_MSG_SetFcnCode(CFE_MSG_PTR(cam_cmd.CmdHeader), CAM_EXP1_CC);
+            cam_status = CFE_SB_TransmitMsg(CFE_MSG_PTR(cam_cmd.CmdHeader), true);
+
+            if (cam_status != CFE_SUCCESS)
+            {
+                ARANYA_EP_App.ErrCounter++;
+                CFE_EVS_SendEvent(ARANYA_EP_CMD_ERR_EID, CFE_EVS_EventType_ERROR,
+                                  "Failed to send CAM capture command: 0x%08lX", (unsigned long)cam_status);
+            }
+            else
+            {
+                OS_printf("[ARANYA_EP_CAM] CAM capture command transmitted.\n");
+            }
+
         }
         break;
     case ARANYA_EP_EXP2_CC:
