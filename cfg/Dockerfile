@@ -29,8 +29,14 @@ RUN apt-get update -y && apt-get install -y curl ca-certificates build-essential
  && rustup target add aarch64-unknown-linux-gnu \
  && rm -rf /var/lib/apt/lists/*
 
+# TODO: import daemon state into VM and map
+# TODO: check if sync works outside of container
 # Install aranya-daemon bin
-RUN cargo install aranya-daemon --version 2.0.0 --target aarch64-unknown-linux-gnu \
+RUN cargo install --git https://github.com/matcala/aranya.git \
+                           --branch cosmos-gate aranya-daemon \
+                           --version 3.0.0 \
+                           --target aarch64-unknown-linux-gnu  \
+                           --features aqc,experimental,afc,preview \
    && mkdir -m 0755 -p /run/aranya/run /run/aranya/config /run/aranya/log /run/aranya/cache /run/aranya/state /etc/aranya
 # Copy sample daemon config
 # WARNING Change once we deploy multiple daemons for cFS to avoid conflicts 
