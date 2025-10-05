@@ -51,36 +51,36 @@ bool ARANYA_EP_InitAranya(void)
 
     /* Track successful builder inits to decide if cleanup is safe */
     // TODO: cleanup all these inited checks, technically not necessary. See example.c
-    bool aqc_builder_inited        = false;
+    // bool aqc_builder_inited        = false;
     bool client_cfg_builder_inited = false;
 
-    /* Build AQC config */
-    AranyaAqcConfigBuilder aqc_builder;
-    rc = aranya_aqc_config_builder_init(&aqc_builder);
-    if (rc != ARANYA_ERROR_SUCCESS)
-    {
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "AQC config builder init failed (%d)", rc);
-        return false; /* do NOT cleanup if init failed */
-    }
-    aqc_builder_inited = true;
-    rc                 = aranya_aqc_config_builder_set_address(&aqc_builder, ARANYA_EP_DEFAULT_AQC_ADDR);
-    if (rc != ARANYA_ERROR_SUCCESS)
-    {
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "AQC set address failed (%d)", rc);
-        aranya_aqc_config_builder_cleanup(&aqc_builder);
-        return false;
-    }
+    // /* Build AQC config */
+    // AranyaAqcConfigBuilder aqc_builder;
+    // rc = aranya_aqc_config_builder_init(&aqc_builder);
+    // if (rc != ARANYA_ERROR_SUCCESS)
+    // {
+    //     CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "AQC config builder init failed (%d)", rc);
+    //     return false; /* do NOT cleanup if init failed */
+    // }
+    // aqc_builder_inited = true;
+    // rc                 = aranya_aqc_config_builder_set_address(&aqc_builder, ARANYA_EP_DEFAULT_AQC_ADDR);
+    // if (rc != ARANYA_ERROR_SUCCESS)
+    // {
+    //     CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "AQC set address failed (%d)", rc);
+    //     aranya_aqc_config_builder_cleanup(&aqc_builder);
+    //     return false;
+    // }
     // A builder's _build consumes it; do not call cleanup after success.
-    AranyaAqcConfig aqc_cfg;
-    rc = aranya_aqc_config_build(&aqc_builder, &aqc_cfg);
-    if (rc != ARANYA_ERROR_SUCCESS)
-    {
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "AQC config build failed (%d)", rc);
-        /* builder consumed only on success; safe to cleanup here */
-        if (aqc_builder_inited)
-            aranya_aqc_config_builder_cleanup(&aqc_builder);
-        return false;
-    }
+    // AranyaAqcConfig aqc_cfg;
+    // rc = aranya_aqc_config_build(&aqc_builder, &aqc_cfg);
+    // if (rc != ARANYA_ERROR_SUCCESS)
+    // {
+    //     CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "AQC config build failed (%d)", rc);
+    //     /* builder consumed only on success; safe to cleanup here */
+    //     if (aqc_builder_inited)
+    //         aranya_aqc_config_builder_cleanup(&aqc_builder);
+    //     return false;
+    // }
 
     /* Build client config */
     AranyaClientConfigBuilder client_cfg_builder;
@@ -103,14 +103,14 @@ bool ARANYA_EP_InitAranya(void)
         return false;
     }
 
-    rc = aranya_client_config_builder_set_aqc_config(&client_cfg_builder, &aqc_cfg);
-    if (rc != ARANYA_ERROR_SUCCESS)
-    {
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "Set AQC config failed (%d)", rc);
-        if (client_cfg_builder_inited)
-            aranya_client_config_builder_cleanup(&client_cfg_builder);
-        return false;
-    }
+    // rc = aranya_client_config_builder_set_aqc_config(&client_cfg_builder, &aqc_cfg);
+    // if (rc != ARANYA_ERROR_SUCCESS)
+    // {
+    //     CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "Set AQC config failed (%d)", rc);
+    //     if (client_cfg_builder_inited)
+    //         aranya_client_config_builder_cleanup(&client_cfg_builder);
+    //     return false;
+    // }
     // Consumed on build.
     AranyaClientConfig client_cfg;
 

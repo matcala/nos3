@@ -25,10 +25,10 @@ aux_source_directory(src APP_SRC_FILES)
 # Build the cFS app
 add_cfe_app(aranya_ep ${APP_SRC_FILES})
 
+# ENABLE_ARANYA_AQC
 # Trying to enable features in client header file
 target_compile_definitions(aranya_ep PRIVATE 
   ENABLE_ARANYA_AFC 
-  ENABLE_ARANYA_AQC 
   ENABLE_ARANYA_PREVIEW 
   ENABLE_ARANYA_EXPERIMENTAL
   )
@@ -46,8 +46,9 @@ corrosion_import_crate(
   MANIFEST_PATH 
   aranya-client-capi/Cargo.toml
   PROFILE release   # linking will fail with debug executable for some reason
-  FEATURES preview afc aqc experimental
+  FEATURES preview afc experimental
 )
+# aqc removed 
 
 # resolves to fsw/build/exe/cpu1/cf
 set(_CFE_STAGE_DIR "${CMAKE_CURRENT_BINARY_DIR}/../../../../../../exe/cpu1/cf")
