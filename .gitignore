@@ -36,3 +36,6 @@ docs/wiki/_build
 docs/wiki/_templates
 *.bkp
 *.html
+
+# Aranya
+components/aranya_ep/fsw/cfs/aranya-client-capi/target
