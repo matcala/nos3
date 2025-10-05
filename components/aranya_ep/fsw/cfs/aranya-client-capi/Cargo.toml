@@ -1,7 +1,7 @@
 [package]
 name = "aranya-client-capi"
 description = "C API for the aranya-client library"
-version = "2.0.0"                # choose same as related crates or set your own
+version = "3.0.0"                # choose same as related crates or set your own
 authors = ["SpiderOak, Inc."]
 edition = "2021"
 license = "AGPL-3.0-only"
