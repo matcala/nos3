@@ -2,89 +2,22 @@
 # purposes.
 name = "cFS-aranya-daemon"
 
-
-# The directory where the daemon stores non-essential
-# runtime files and other file objects (sockets etc.).
-#
-# # Multiple Daemon Support
-#
-# This directory should be unique for each instance of the
-# daemon.
-#
-# # Example
-#
-# For example this could be `/var/run/aranya`.
-#
-# See also = systemd `RuntimeDirectory=` and
-# `$XDG_RUNTIME_DIR`.
+name = "member"
 runtime_dir = "/run/aranya/run"
-
-# The directory where the daemon stores non-portable data
-# that should persist between application restarts.
-#
-# # Multiple Daemon Support
-#
-# This directory should be unique for each instance of the
-# daemon.
-#
-# # Example
-#
-# For example this could be `/var/lib/aranya`.
-#
-# See also = systemd `StateDirectory=` and
-# `$XDG_STATE_HOME`.
 state_dir = "/run/aranya/state"
-
-# The directory where the daemon stores non-essential data
-# files.
-#
-# # Multiple Daemon Support
-#
-# This directory should be unique for each instance of the
-# daemon.
-#
-# # Example
-#
-# For example this could be `/var/cache/aranya`.
-#
-# See also = systemd `CacheDirectory=` and
-# `$XDG_CACHE_HOME`.
 cache_dir = "/run/aranya/cache"
-
-# The directory where the daemon writes log files.
-#
-# # Multiple Daemon Support
-#
-# This directory should be unique for each instance of the
-# daemon.
-#
-# # Example
-#
-# For example this could be `/var/log/aranya`.
-#
-# See also = systemd `LogsDirectory=`.
-logs_dir = "/run/aranya/log"
-
-# The directory where the daemon can find additional
-# configuration files.
-#
-# # Multiple Daemon Support
-#
-# This directory should be unique for each instance of the
-# daemon.
-#
-# # Example
-#
-# For example this could be `/etc/aranya`.
-#
-# See also = systemd `ConfigDirectory=` and
-# `$XDG_CONFIG_HOME`.
+logs_dir = "/run/aranya/logs"
 config_dir = "/run/aranya/config"
+
+[afc]
+enable = true
+shm_path = "/shm_member"
+max_chans = 100
 
 [aqc]
 enable = true
 
 [sync.quic]
 enable = true
-# Aranya sync server address.
+# Aranya sync server listen address
 addr = "0.0.0.0:9999"
