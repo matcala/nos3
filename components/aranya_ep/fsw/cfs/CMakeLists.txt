@@ -38,6 +38,7 @@ corrosion_import_crate(
   MANIFEST_PATH 
   aranya-client-capi/Cargo.toml
   PROFILE release   # linking will fail with debug executable for some reason
+  FEATURES preview afc aqc experimental
 )
 
 # resolves to fsw/build/exe/cpu1/cf
