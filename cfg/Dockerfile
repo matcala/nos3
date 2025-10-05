@@ -28,27 +28,25 @@ RUN apt-get update -y && apt-get install -y curl ca-certificates build-essential
  && rustup component add rustfmt clippy \
  && rustup target add aarch64-unknown-linux-gnu \
  && rm -rf /var/lib/apt/lists/*
+ 
+ # Did not fix warning
+ RUN git config --global --add safe.directory https://github.com/matcala/aranya.git
+ 
+ # TODO: import daemon state into VM and map
+ # TODO: check if sync works outside of container
+ # Install aranya-daemon bin
+ RUN cargo install --git https://github.com/matcala/aranya.git \
+    --branch cosmos-gate aranya-daemon \
+    --version 3.0.0 \
+    --target aarch64-unknown-linux-gnu  \
+    --features aqc,experimental,afc,preview \
+    # Maybe remove as the COPY below should overwrite it
+    && mkdir -m 0755 -p /run/aranya/run /run/aranya/config /run/aranya/logs /run/aranya/cache /run/aranya/state /etc/aranya
+ 
+ # RUN apt-get update && apt-get install valgrind -y
 
-# Did not fix warning
-RUN git config --global --add safe.directory https://github.com/matcala/aranya.git
-
-
-# TODO: import daemon state into VM and map
-# TODO: check if sync works outside of container
-# Install aranya-daemon bin
-RUN cargo install --git https://github.com/matcala/aranya.git \
-                           --branch cosmos-gate aranya-daemon \
-                           --version 3.0.0 \
-                           --target aarch64-unknown-linux-gnu  \
-                           --features aqc,experimental,afc,preview \
-   && mkdir -m 0755 -p /run/aranya/run /run/aranya/config /run/aranya/log /run/aranya/cache /run/aranya/state /etc/aranya
-
-   # Copy sample daemon configa 
+# TODO: COPY cfs-daemon state in dest dir
+COPY ./cfg/cfs-daemon /run/aranya/   
+# Copy sample daemon config
 # WARNING Change once we deploy multiple daemons for cFS to avoid conflicts 
-COPY ./../components/aranya_ep/fsw/cfs/cfg/daemon-config.toml /etc/aranya/daemon-config.toml
-
-
-# Consider adding
-# git config --global --add safe.directory /media/sf_cfs/build/native/default_cpu1/_deps/corrosion-src
-# to solve possible cmake corrosion import issues
-# Don't know if container has git installed though
+COPY ./components/aranya_ep/fsw/cfs/cfg/daemon-config.toml /etc/aranya/daemon-config.toml
