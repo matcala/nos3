@@ -38,7 +38,8 @@ RUN cargo install --git https://github.com/matcala/aranya.git \
                            --target aarch64-unknown-linux-gnu  \
                            --features aqc,experimental,afc,preview \
    && mkdir -m 0755 -p /run/aranya/run /run/aranya/config /run/aranya/log /run/aranya/cache /run/aranya/state /etc/aranya
-# Copy sample daemon config
+
+   # Copy sample daemon configa 
 # WARNING Change once we deploy multiple daemons for cFS to avoid conflicts 
 COPY ./../components/aranya_ep/fsw/cfs/cfg/daemon-config.toml /etc/aranya/daemon-config.toml
 

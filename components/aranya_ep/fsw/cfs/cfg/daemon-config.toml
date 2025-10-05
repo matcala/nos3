@@ -2,12 +2,18 @@
 # purposes.
 name = "cFS-aranya-daemon"
 
-name = "member"
 runtime_dir = "/run/aranya/run"
 state_dir = "/run/aranya/state"
 cache_dir = "/run/aranya/cache"
-logs_dir = "/run/aranya/logs"
+logs_dir = "/run/aranya/log"
 config_dir = "/run/aranya/config"
+
+
+# runtime_dir = "/var/run/aranya/run"
+# state_dir = "/var/run/aranya/state"
+# cache_dir = "/var/run/aranya/cache"
+# logs_dir = "/var/run/aranya/logs"
+# config_dir = "/var/run/aranya/config"
 
 [afc]
 enable = true
