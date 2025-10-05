@@ -1,0 +1,27 @@
+#0  0x0000f06016d18e40 in tokio::runtime::task::core::Cell<T,S>::new ()
+   from /media/sf_nos3/fsw/build/amd64-nos3/default_cpu1/apps/aranya_ep/fsw/cfs/../../../../../../exe/cpu1/cf/libaranya_client_capi.so
+#1  0x0000f06016ca6360 in tokio::runtime::scheduler::multi_thread::handle::Handle::bind_new_task ()
+   from /media/sf_nos3/fsw/build/amd64-nos3/default_cpu1/apps/aranya_ep/fsw/cfs/../../../../../../exe/cpu1/cf/libaranya_client_capi.so
+#2  0x0000f06016d1b228 in tokio::runtime::handle::Handle::spawn ()
+   from /media/sf_nos3/fsw/build/amd64-nos3/default_cpu1/apps/aranya_ep/fsw/cfs/../../../../../../exe/cpu1/cf/libaranya_client_capi.so
+#3  0x0000f06016c5517c in aranya_internal_s2n_quic::provider::io::tokio::<impl aranya_internal_s2n_quic::provider::io::Provider for s2n_quic_platform::io::tokio::Io>::start ()
+   from /media/sf_nos3/fsw/build/amd64-nos3/default_cpu1/apps/aranya_ep/fsw/cfs/../../../../../../exe/cpu1/cf/libaranya_client_capi.so
+#4  0x0000f06016cf9fbc in aranya_internal_s2n_quic::server::providers::Providers<CongestionController,ConnectionCloseFormatter,ConnectionID,PacketInterceptor,StatelessResetToken,Random,EndpointLimits,Event,Limits,Mtu,IO,PathMigration,Sync,Tls,AddressToken,Datagram,Dc>::start ()
+   from /media/sf_nos3/fsw/build/amd64-nos3/default_cpu1/apps/aranya_ep/fsw/cfs/../../../../../../exe/cpu1/cf/libaranya_client_capi.so
+#5  0x0000f06016be8740 in aranya_client::client::ClientBuilder::connect::{{closure}}::{{closure}}::{{closure}} ()
+   from /media/sf_nos3/fsw/build/amd64-nos3/default_cpu1/apps/aranya_ep/fsw/cfs/../../../../../../exe/cpu1/cf/libaranya_client_capi.so
+#6  0x0000f06016bfe3d0 in tokio::runtime::park::CachedParkThread::block_on ()
+   from /media/sf_nos3/fsw/build/amd64-nos3/default_cpu1/apps/aranya_ep/fsw/cfs/../../../../../../exe/cpu1/cf/libaranya_client_capi.so
+#7  0x0000f06016c7db74 in tokio::runtime::context::runtime::enter_runtime ()
+   from /media/sf_nos3/fsw/build/amd64-nos3/default_cpu1/apps/aranya_ep/fsw/cfs/../../../../../../exe/cpu1/cf/libaranya_client_capi.so
+#8  0x0000f06016c3c2b8 in tokio::runtime::runtime::Runtime::block_on ()
+   from /media/sf_nos3/fsw/build/amd64-nos3/default_cpu1/apps/aranya_ep/fsw/cfs/../../../../../../exe/cpu1/cf/libaranya_client_capi.so
+#9  0x0000f06016ca86f0 in aranya_client_capi::api::defs::client_init ()
+   from /media/sf_nos3/fsw/build/amd64-nos3/default_cpu1/apps/aranya_ep/fsw/cfs/../../../../../../exe/cpu1/cf/libaranya_client_capi.so
+#10 0x0000f06016b4f76c in aranya_client_init_ext ()
+   from /media/sf_nos3/fsw/build/amd64-nos3/default_cpu1/apps/aranya_ep/fsw/cfs/../../../../../../exe/cpu1/cf/libaranya_client_capi.so
+#11 0x0000f06017223dcc in ARANYA_EP_InitAranya () at /media/sf_nos3/components/aranya_ep/fsw/cfs/src/aranya_ep_utils.c:148
+#12 0x0000f06017224f34 in ARANYA_EP_Init () at /media/sf_nos3/components/aranya_ep/fsw/cfs/src/aranya_ep_utils.c:402
+#13 0x0000f06017222a74 in ARANYA_EP_AppMain () at /media/sf_nos3/components/aranya_ep/fsw/cfs/src/aranya_ep_app.c:23
+#14 0x0000b4b09645c774 in CFE_ES_TaskEntryPoint () at /media/sf_nos3/fsw/cfe/modules/es/fsw/src/cfe_es_apps.c:566
+#15 0x0000b4b09648f734 in OS_TaskEntryPoint (task_id=65551) at /media/sf_nos3/fsw/osal/src/os/shared/src/osapi-task.c:132

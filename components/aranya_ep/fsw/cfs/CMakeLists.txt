@@ -25,6 +25,14 @@ aux_source_directory(src APP_SRC_FILES)
 # Build the cFS app
 add_cfe_app(aranya_ep ${APP_SRC_FILES})
 
+# Trying to enable features in client header file
+target_compile_definitions(aranya_ep PRIVATE 
+  ENABLE_ARANYA_AFC 
+  ENABLE_ARANYA_AQC 
+  ENABLE_ARANYA_PREVIEW 
+  ENABLE_ARANYA_EXPERIMENTAL
+  )
+
 # Ensuring rust pipeline matches with the one installed in the build container and with the aranya one
 set(Rust_TOOLCHAIN "1.85-aarch64-unknown-linux-gnu")  # rustup toolchain name inside container
 set(Rust_CARGO_TARGET "aarch64-unknown-linux-gnu") # corrosion asked to specify

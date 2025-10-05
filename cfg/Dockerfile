@@ -29,8 +29,8 @@ RUN apt-get update -y && apt-get install -y curl ca-certificates build-essential
  && rustup target add aarch64-unknown-linux-gnu \
  && rm -rf /var/lib/apt/lists/*
 
-
-# RUN git config --global --add safe.directory https://github.com/matcala/aranya.git
+# Did not fix warning
+RUN git config --global --add safe.directory https://github.com/matcala/aranya.git
 
 
 # TODO: import daemon state into VM and map

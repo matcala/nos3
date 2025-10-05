@@ -1,14 +1,15 @@
 # The name of the daemon used for logging and debugging
 # purposes.
-name = "cFS-aranya-daemon"
+name = "member"
 
+# work dir used inside cFS container
 runtime_dir = "/run/aranya/run"
 state_dir = "/run/aranya/state"
 cache_dir = "/run/aranya/cache"
 logs_dir = "/run/aranya/log"
 config_dir = "/run/aranya/config"
 
-
+# used in case of debug due to permission issues
 # runtime_dir = "/var/run/aranya/run"
 # state_dir = "/var/run/aranya/state"
 # cache_dir = "/var/run/aranya/cache"

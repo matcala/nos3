@@ -18,7 +18,13 @@
 #include "aranya_ep_msg.h"
 #include "aranya_ep_version.h"
 #include "aranya_ep_perfids.h"
-#include "aranya-client.h" /* for aranya_id_to_str / ARANYA_ID_STR_LEN */
+
+// Enable access to features through header
+// #define ENABLE_ARANYA_AFC
+// #define ENABLE_ARANYA_AQC
+// #define ENABLE_ARANYA_PREVIEW
+// #define ENABLE_ARANYA_EXPERIMENTAL 
+#include "aranya-client.h" /* Aranya C API */
 
 /* Persistent HK packet to avoid using a stack buffer that may be accessed
  * asynchronously by the software bus after ARANYA_EP_SendHousekeeping returns. */
@@ -107,15 +113,37 @@ bool ARANYA_EP_InitAranya(void)
     }
     // Consumed on build.
     AranyaClientConfig client_cfg;
-    rc = aranya_client_config_build(&client_cfg_builder, &client_cfg);
+
+    /* Use extended build to capture detailed error */
+    AranyaExtError ext_err;
+    memset(&ext_err, 0, sizeof(ext_err));
+    rc = aranya_client_config_build_ext(&client_cfg_builder, &client_cfg, &ext_err);
     if (rc != ARANYA_ERROR_SUCCESS)
     {
-        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR, "Client config build failed (%d)", rc);
+        size_t err_len = 0;
+        aranya_ext_error_msg(&ext_err, NULL, &err_len); /* query needed size */
+        const char *fallback = "unknown";
+        char       *buf      = NULL;
+        if (err_len > 0 && err_len < 4096)
+        {
+            buf = (char *)malloc(err_len);
+            if (buf)
+            {
+                if (aranya_ext_error_msg(&ext_err, buf, &err_len) != ARANYA_ERROR_SUCCESS)
+                {
+                    free(buf);
+                    buf = NULL;
+                }
+            }
+        }
+        CFE_EVS_SendEvent(ARANYA_EP_ARANYA_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "Client config build failed (%d): %s", rc, buf ? buf : fallback);
+        if (buf)
+            free(buf);
         return false;
     }
 
     /* Initialize client */
-    AranyaExtError ext_err;
     memset(&ext_err, 0, sizeof(ext_err));
     rc = aranya_client_init_ext(&ARANYA_EP_App.Client, &client_cfg, &ext_err);
     if (rc != ARANYA_ERROR_SUCCESS)
