@@ -1,12 +1,12 @@
 # The name of the daemon used for logging and debugging
 # purposes.
-name = "member"
+name = "cfs_client"
 
 # work dir used inside cFS container
 runtime_dir = "/run/aranya/run"
 state_dir = "/run/aranya/state"
 cache_dir = "/run/aranya/cache"
-logs_dir = "/run/aranya/log"
+logs_dir = "/run/aranya/logs"
 config_dir = "/run/aranya/config"
 
 # used in case of debug due to permission issues
@@ -18,7 +18,7 @@ config_dir = "/run/aranya/config"
 
 [afc]
 enable = true
-shm_path = "/shm_member"
+shm_path = "/shm_cfs_client"
 max_chans = 100
 
 [aqc]
