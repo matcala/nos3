@@ -145,7 +145,7 @@ dependencies = [
 
 [[package]]
 name = "aranya-client-capi"
-version = "2.0.0"
+version = "3.0.0"
 dependencies = [
  "anyhow",
  "aranya-capi-codegen",
