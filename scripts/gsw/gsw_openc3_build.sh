@@ -93,6 +93,9 @@ then
     exit 1
 fi
 
+# Add variable definition to set gate REST endpoint at runtime
+echo "VARIABLE gate_rest_endpoint   host.docker.internal:8000/authorize" >> plugin.txt
+
 for i in $targets
 do
     if [ "$i" != "SIM_42_TRUTH" -a "$i" != "SYSTEM" -a "$i" != "TO_DEBUG" ]
@@ -105,6 +108,9 @@ do
         echo TARGET $i $i >> plugin.txt
     fi
 done
+
+# This is where targets get mapped to DEBUG interface
+# Maybe inject WRITE protocol here to apply to all targets?
 echo "" >> plugin.txt
 echo "INTERFACE DEBUG udp_interface.rb nos-fsw 5012 5013 nil nil 128 10.0 nil" >> plugin.txt
 for i in $targets
@@ -116,7 +122,9 @@ do
     fi
 done
 echo "   MAP_TARGET TO_DEBUG" >> plugin.txt
+echo "   PROTOCOL WRITE ARANYA_EP/lib/dispatcher.rb localhost:8000/authorize" >> plugin.txt
 echo "" >> plugin.txt
+# Attached custom protocol to forward packets to GATE
 
 echo "INTERFACE RADIO udp_interface.rb radio-sim 6010 6011 nil nil 128 10.0 nil" >> plugin.txt
 for i in $targets
