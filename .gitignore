@@ -39,3 +39,4 @@ docs/wiki/_templates
 
 # Aranya
 components/aranya_ep/fsw/cfs/aranya-client-capi/target
+cfg/cfs-daemon
