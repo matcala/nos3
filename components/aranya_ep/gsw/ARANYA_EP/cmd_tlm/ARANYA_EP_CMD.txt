@@ -26,7 +26,7 @@ COMMAND ARANYA_EP ARANYA_EP_EXP2 <%= CosmosCfsConfig::PROCESSOR_ENDIAN %>   "Cap
   APPEND_PARAMETER CCSDS_LENGTH        16 UINT MIN_UINT16 MAX_UINT16 129    "CCSDS Packet Data Length" BIG_ENDIAN
   APPEND_PARAMETER CCSDS_FC            8  UINT MIN_UINT8 MAX_UINT8 3        "CCSDS Command Function Code"
   APPEND_PARAMETER CCSDS_CHECKSUM      8  UINT MIN_UINT8 MAX_UINT8 0        "CCSDS Command Checksum"
-  APPEND_PARAMETER SER_CMD             1024 BLOCK 0                         "Serialized Aranya Command"
+  APPEND_PARAMETER SER_CMD             0 BLOCK 0x0                          "Serialized Aranya Command"
 
 COMMAND ARANYA_EP ARANYA_EP_REQ_HK_TLM <%= CosmosCfsConfig::PROCESSOR_ENDIAN %> "Aranya Endpoint Request Housekeeping"
   APPEND_PARAMETER CCSDS_STREAMID      16 UINT MIN_UINT16 MAX_UINT16 0x18A1 "CCSDS Packet Identification" BIG_ENDIAN
