@@ -17,6 +17,7 @@ module OpenC3
     # ---- WRITE side ----
     # Called BEFORE encoding. Return the packet to continue, or :STOP / :DISCONNECT
     def write_packet(packet)
+      @last_response_bytes = nil
       keycloak_id = @keycloak_identity || 'unknown'
       pkt_name    = packet.packet_name
       tgt_name    = packet.target_name
@@ -26,6 +27,12 @@ module OpenC3
       func_code_item = packet.get_item('CCSDS_FC')
       stream_id      = packet.read_item(stream_id_item)  # default :CONVERTED
       func_code      = packet.read_item(func_code_item)  # default :CONVERTED
+
+      # Only process ARANYA_EP command packets for now
+      if tgt_name != 'ARANYA_EP_DEBUG'
+        Logger.info("Dispatcher: Skipping non-ARANYA_EP target #{tgt_name}")
+        return packet
+      end
 
       # Let NOOP pass through without remote check
       if func_code == 1
@@ -49,7 +56,7 @@ module OpenC3
       should_continue = dispatch_packet(summary_json)
       unless should_continue
         Logger.warn('Dispatcher: Gate denied or error; stopping pipeline')
-        return :STOP  # COSMOS expects :STOP to halt write chain. :contentReference[oaicite:2]{index=2}
+        return :STOP
       end
 
       # Populate SER_CMD with raw response bytes (BLOCK field in command)
@@ -94,9 +101,14 @@ module OpenC3
       uri       = URI.parse(@rest_endpoint)
       http      = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = (uri.scheme == 'https')
+      # Add conservative timeouts to avoid blocking indefinitely
+      http.open_timeout = 5
+      http.read_timeout = 5
+      http.write_timeout = 5 if http.respond_to?(:write_timeout=)
 
       req = Net::HTTP::Post.new(uri.request_uri)
       req['Content-Type'] = 'application/json'
+      req['Accept'] = 'application/octet-stream'
       req.body = summary_json
 
       begin
@@ -124,6 +136,14 @@ module OpenC3
           Logger.error("Dispatcher: HTTP #{res.code} from #{@rest_endpoint}: #{preview}")
           false
         end
+      rescue Net::OpenTimeout, Net::ReadTimeout => e
+        @last_response_bytes = nil
+        Logger.error("Dispatcher: Timeout to #{@rest_endpoint}: #{e.class}: #{e.message}")
+        false
+      rescue Errno::ECONNREFUSED, SocketError => e
+        @last_response_bytes = nil
+        Logger.error("Dispatcher: Connection error to #{@rest_endpoint}: #{e.class}: #{e.message}")
+        false
       rescue Net::HTTPError => e
         @last_response_bytes = e.respond_to?(:response) && e.response ? (e.response.body || '').b : nil
         body_str =
