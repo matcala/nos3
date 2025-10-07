@@ -94,7 +94,7 @@ then
 fi
 
 # Add variable definition to set gate REST endpoint at runtime
-echo "VARIABLE gate_rest_endpoint   host.docker.internal:8000/authorize" >> plugin.txt
+echo "VARIABLE gate_rest_endpoint   host.docker.internal:8080/authorize" >> plugin.txt
 
 for i in $targets
 do
@@ -122,7 +122,7 @@ do
     fi
 done
 echo "   MAP_TARGET TO_DEBUG" >> plugin.txt
-echo "   PROTOCOL WRITE ARANYA_EP/lib/dispatcher.rb localhost:8000/authorize" >> plugin.txt
+echo "   PROTOCOL WRITE ARANYA_EP_DEBUG/lib/dispatcher.rb <%= gate_rest_endpoint %>" >> plugin.txt
 echo "" >> plugin.txt
 # Attached custom protocol to forward packets to GATE
 
